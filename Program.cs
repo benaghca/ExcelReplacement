@@ -4,12 +4,13 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using CsvHelper;
 using CsvHelper.Configuration;
 
-namespace ExcelReplacementApp
+namespace ExcelReplacement
 {
     internal class Program
     {
@@ -17,7 +18,7 @@ namespace ExcelReplacementApp
         {
             if (args.Length < 3)
             {
-                Console.WriteLine("Usage: ExcelReplacementApp <csvFilePath> <templateDirectory> <outputDirectory>");
+                Console.WriteLine("Usage: ExcelReplacement <csvFilePath> <templateDirectory> <outputDirectory>");
                 return;
             }
 
@@ -53,6 +54,7 @@ namespace ExcelReplacementApp
 
             using (var reader = new StreamReader(csvFilePath))
             {
+                /*
                 // Print the first few lines of the CSV file for debugging
                 Console.WriteLine("First few lines of the CSV file:");
                 for (int i = 0; i < 5; i++)
@@ -60,6 +62,7 @@ namespace ExcelReplacementApp
                     if (reader.EndOfStream) break;
                     Console.WriteLine(reader.ReadLine());
                 }
+                */
 
                 reader.BaseStream.Seek(0, SeekOrigin.Begin); // Reset the reader to the beginning
                 reader.DiscardBufferedData();
@@ -79,6 +82,7 @@ namespace ExcelReplacementApp
                         throw new Exception("CSV file does not contain headers.");
                     }
 
+                    // Print headers for debugging
                     Console.WriteLine("Headers found in CSV:");
                     foreach (var header in headers)
                     {
@@ -110,42 +114,60 @@ namespace ExcelReplacementApp
             using (var document = SpreadsheetDocument.Open(outputFilePath, true))
             {
                 var workbookPart = document.WorkbookPart;
+                var sheets = workbookPart.Workbook.Sheets.Cast<Sheet>();
 
-                foreach (var sheet in workbookPart.Workbook.Sheets.Elements<Sheet>())
+                foreach (var sheet in sheets)
                 {
                     var worksheetPart = (WorksheetPart)workbookPart.GetPartById(sheet.Id);
-                    var sheetData = worksheetPart.Worksheet.GetFirstChild<SheetData>();
+                    var sheetData = worksheetPart.Worksheet.Elements<SheetData>().FirstOrDefault();
 
-                    foreach (var row in sheetData.Elements<Row>())
+                    if (sheetData != null)
                     {
-                        foreach (var cell in row.Elements<Cell>())
+                        foreach (var row in sheetData.Elements<Row>())
                         {
-                            string cellValue = GetCellValue(cell, workbookPart);
-                            if (string.IsNullOrEmpty(cellValue))
+                            foreach (var cell in row.Elements<Cell>())
                             {
-                                Console.WriteLine($"Cell {cell.CellReference} is empty or has an unsupported data type.");
-                                continue;
-                            }
-
-                            // Process the cell value
-                            if (cellValue.Contains("[[") && cellValue.Contains("]]"))
-                            {
-                                var placeholders = ExtractPlaceholders(cellValue);
-                                foreach (var placeholder in placeholders)
+                                if (cell.DataType != null && cell.DataType == CellValues.SharedString)
                                 {
-                                    if (record.ContainsKey(placeholder))
+                                    int sharedStringIndex = int.Parse(cell.CellValue.Text);
+                                    var sharedStringItem = workbookPart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(sharedStringIndex);
+
+                                    if (sharedStringItem.Text != null)
                                     {
-                                        cellValue = cellValue.Replace($"[[{placeholder}]]", record[placeholder]);
+                                        // Simple text replacement
+                                        string cellText = sharedStringItem.Text.Text;
+                                        foreach (var key in record.Keys)
+                                        {
+                                            string placeholder = $"[[{key}]]";
+                                            if (cellText.Contains(placeholder))
+                                            {
+                                                cellText = cellText.Replace(placeholder, record[key]);
+                                            }
+                                        }
+                                        sharedStringItem.Text = new Text(cellText);
+                                    }
+                                    else if (sharedStringItem.Elements<Run>().Any())
+                                    {
+                                        // Handle text runs for preserving formatting
+                                        foreach (var run in sharedStringItem.Elements<Run>())
+                                        {
+                                            string runText = run.Text.Text;
+                                            foreach (var key in record.Keys)
+                                            {
+                                                string placeholder = $"[[{key}]]";
+                                                if (runText.Contains(placeholder))
+                                                {
+                                                    runText = runText.Replace(placeholder, record[key]);
+                                                }
+                                            }
+                                            run.Text = new Text(runText) { Space = SpaceProcessingModeValues.Preserve };
+                                        }
                                     }
                                 }
-                                SetCellValue(cell, cellValue);
                             }
                         }
                     }
                 }
-
-                // Save the processed file
-                workbookPart.Workbook.Save();
             }
         }
 
@@ -189,7 +211,7 @@ namespace ExcelReplacementApp
 
         private static string GenerateOutputFileName(Dictionary<string, string> record)
         {
-            return $"{record["Site"]}_{record["Building"]}_{record["Lineup"]}_{record["Equipment"]}_{record["Procedure"]}.xlsx";
+            return $"{record["Site"]} {record["Building"]} {record["Equipment"]} {record["Lineup"]} {record["Procedure"]}.xlsx";
         }
     }
 }
