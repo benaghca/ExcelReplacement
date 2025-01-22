@@ -9,7 +9,7 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using CsvHelper;
 using CsvHelper.Configuration;
 
-namespace ExcelReplacementApp
+namespace ExcelReplacement
 {
     internal class Program
     {
@@ -17,7 +17,7 @@ namespace ExcelReplacementApp
         {
             if (args.Length < 3)
             {
-                Console.WriteLine("Usage: ExcelReplacementApp <csvFilePath> <templateDirectory> <outputDirectory>");
+                Console.WriteLine("Usage: ExcelReplacement <csvFilePath> <templateDirectory> <outputDirectory>");
                 return;
             }
 
@@ -53,6 +53,7 @@ namespace ExcelReplacementApp
 
             using (var reader = new StreamReader(csvFilePath))
             {
+                /*
                 // Print the first few lines of the CSV file for debugging
                 Console.WriteLine("First few lines of the CSV file:");
                 for (int i = 0; i < 5; i++)
@@ -60,6 +61,7 @@ namespace ExcelReplacementApp
                     if (reader.EndOfStream) break;
                     Console.WriteLine(reader.ReadLine());
                 }
+                */
 
                 reader.BaseStream.Seek(0, SeekOrigin.Begin); // Reset the reader to the beginning
                 reader.DiscardBufferedData();
@@ -79,6 +81,7 @@ namespace ExcelReplacementApp
                         throw new Exception("CSV file does not contain headers.");
                     }
 
+                    // Print headers for debugging
                     Console.WriteLine("Headers found in CSV:");
                     foreach (var header in headers)
                     {
@@ -121,6 +124,8 @@ namespace ExcelReplacementApp
                         foreach (var cell in row.Elements<Cell>())
                         {
                             string cellValue = GetCellValue(cell, workbookPart);
+                            
+                            // Debugging for empty cells
                             if (string.IsNullOrEmpty(cellValue))
                             {
                                 Console.WriteLine($"Cell {cell.CellReference} is empty or has an unsupported data type.");
@@ -189,7 +194,7 @@ namespace ExcelReplacementApp
 
         private static string GenerateOutputFileName(Dictionary<string, string> record)
         {
-            return $"{record["Site"]}_{record["Building"]}_{record["Lineup"]}_{record["Equipment"]}_{record["Procedure"]}.xlsx";
+            return $"{record["Site"]}_{record["Building"]}_{record["Equipment"]}_{record["Lineup"]}_{record["Procedure"]}.xlsx";
         }
     }
 }
