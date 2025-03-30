@@ -29,6 +29,24 @@ This tool allows you to:
    - The application will process the files and display progress
    - When complete, you'll see a summary of the processed records
 
+## Distribution for non-developers
+
+You can distribute the application as a standalone executable that doesn't require .NET SDK installation:
+
+1. **Publish as a self-contained, single-file application**:
+   ```
+   dotnet publish -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true
+   ```
+
+2. **Locate the executable**:
+   - The executable will be in the `bin\Release\net9.0-windows\win-x64\publish` directory
+   - The file will be named `ExcelReplacement.exe`
+
+3. **Distribute to users**:
+   - Users can run the application by double-clicking the .exe file
+   - No installation or administrative privileges required
+   - The application can be run from any location, including USB drives
+
 ## File requirements
 
 ### CSV File
