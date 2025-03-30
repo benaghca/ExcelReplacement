@@ -1,0 +1,6 @@
+Site,Building,Equipment,Procedure,Lineup,Panel-1,Breaker-1,Breaker-2
+Site1,BuildingA,Pump-01,Monthly Inspection,A1,MP-11,CKT-34/36/38,CKT-28/30/32
+Site1,BuildingA,Valve-02,Pressure Test,B2,MP-12,CKT-34/36/38,CKT-28/30/32
+Site2,BuildingB,Motor-01,Lubrication,C3,MP-13,CKT-34/36/38,CKT-28/30/32
+Site2,BuildingB,Controller-01,Calibration,D4,MP-14,CKT-34/36/38,CKT-28/30/32
+Site1,BuildingC,Tank-01,Visual Inspection,A2,MP-15,CKT-34/36/38,CKT-28/30/32

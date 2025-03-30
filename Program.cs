@@ -9,209 +9,193 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using CsvHelper;
 using CsvHelper.Configuration;
+using ExcelReplacement.Models;
+using ExcelReplacement.Services;
+using System.Windows.Forms;
 
 namespace ExcelReplacement
 {
     internal class Program
     {
-        static void Main(string[] args)
+        private static readonly CsvService _csvService = new();
+        private static readonly ExcelService _excelService = new();
+
+        [STAThread]
+        static void Main()
         {
-            if (args.Length < 3)
+            try
             {
-                Console.WriteLine("Usage: ExcelReplacement <csvFilePath> <templateDirectory> <outputDirectory>");
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+
+                var (csvPath, templatePath, outputDir) = GetFilesFromUser();
+                if (csvPath == null || templatePath == null || outputDir == null)
+                {
+                    return;
+                }
+
+                ProcessFiles(csvPath, templatePath, outputDir);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}\n\nPlease check your input files and try again.", 
+                              "Error", 
+                              MessageBoxButtons.OK, 
+                              MessageBoxIcon.Error);
+            }
+        }
+
+        private static (string csvPath, string templatePath, string outputDir) GetFilesFromUser()
+        {
+            string csvPath = null;
+            string templatePath = null;
+            string outputDir = null;
+
+            // Select CSV file
+            using (var dialog = new OpenFileDialog())
+            {
+                dialog.Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*";
+                dialog.Title = "Select CSV file with replacement data";
+                if (dialog.ShowDialog() != DialogResult.OK)
+                {
+                    return (null, null, null);
+                }
+                csvPath = dialog.FileName;
+            }
+
+            // Select Excel template
+            using (var dialog = new OpenFileDialog())
+            {
+                dialog.Filter = "Excel files (*.xlsx)|*.xlsx|All files (*.*)|*.*";
+                dialog.Title = "Select Excel template file";
+                if (dialog.ShowDialog() != DialogResult.OK)
+                {
+                    return (null, null, null);
+                }
+                templatePath = dialog.FileName;
+            }
+
+            // Select output directory
+            using (var dialog = new FolderBrowserDialog())
+            {
+                dialog.Description = "Select directory for output files";
+                if (dialog.ShowDialog() != DialogResult.OK)
+                {
+                    return (null, null, null);
+                }
+                outputDir = dialog.SelectedPath;
+            }
+
+            return (csvPath, templatePath, outputDir);
+        }
+
+        private static void ProcessFiles(string csvPath, string templatePath, string outputDir)
+        {
+            var progressForm = new ProgressForm();
+            progressForm.Show();
+
+            EnsureOutputDirectoryExists(outputDir);
+            var records = LoadCsvData(csvPath);
+            ProcessRecords(records, templatePath, outputDir, progressForm);
+            PrintSummary(records.Count, progressForm);
+        }
+
+        private static void EnsureOutputDirectoryExists(string outputDir)
+        {
+            if (!Directory.Exists(outputDir))
+            {
+                Directory.CreateDirectory(outputDir);
+            }
+        }
+
+        private static List<ExcelRecord> LoadCsvData(string csvPath)
+        {
+            return _csvService.LoadCsvData(csvPath);
+        }
+
+        private static void ProcessRecords(List<ExcelRecord> records, string templatePath, string outputDir, ProgressForm progressForm)
+        {
+            for (int i = 0; i < records.Count; i++)
+            {
+                var record = records[i];
+                var outputPath = Path.Combine(outputDir, record.GenerateFileName());
+                
+                progressForm.UpdateProgress(i + 1, records.Count, record.GenerateFileName());
+                _excelService.ProcessRecord(record, templatePath, outputPath);
+            }
+        }
+
+        private static void PrintSummary(int recordCount, ProgressForm progressForm)
+        {
+            progressForm.ShowSummary($"Successfully processed {recordCount} records");
+        }
+    }
+
+    public class ProgressForm : Form
+    {
+        private Label statusLabel;
+        private ProgressBar progressBar;
+        private Label currentFileLabel;
+
+        public ProgressForm()
+        {
+            InitializeComponents();
+        }
+
+        private void InitializeComponents()
+        {
+            this.Text = "Excel Replacement Progress";
+            this.Size = new System.Drawing.Size(400, 150);
+            this.FormBorderStyle = FormBorderStyle.FixedDialog;
+            this.StartPosition = FormStartPosition.CenterScreen;
+            this.ControlBox = false;
+
+            statusLabel = new Label
+            {
+                Text = "Processing files...",
+                Location = new System.Drawing.Point(10, 10),
+                AutoSize = true
+            };
+
+            progressBar = new ProgressBar
+            {
+                Location = new System.Drawing.Point(10, 40),
+                Width = 360
+            };
+
+            currentFileLabel = new Label
+            {
+                Location = new System.Drawing.Point(10, 70),
+                AutoSize = true
+            };
+
+            this.Controls.AddRange(new System.Windows.Forms.Control[] { statusLabel, progressBar, currentFileLabel });
+        }
+
+        public void UpdateProgress(int current, int total, string currentFile)
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action(() => UpdateProgress(current, total, currentFile)));
                 return;
             }
 
-            Console.WriteLine("Arguments received:");
-            foreach (var arg in args)
-            {
-                Console.WriteLine(arg);
-            }
-
-            string csvFilePath = args[0];
-            string templateDirectory = args[1];
-            string outputDirectory = args[2];
-            var nameColumns = new List<string> { "Site", "Building", "Lineup", "Equipment", "Procedure" };
-
-            if (!Directory.Exists(outputDirectory))
-            {
-                Directory.CreateDirectory(outputDirectory);
-            }
-
-            var records = LoadCsvData(csvFilePath);
-
-            foreach (var record in records)
-            {
-                ProcessRecord(record, nameColumns, templateDirectory, outputDirectory);
-            }
-
-            Console.WriteLine("Completed processing.");
+            progressBar.Maximum = total;
+            progressBar.Value = current;
+            currentFileLabel.Text = $"Processing: {currentFile}";
         }
 
-        private static List<Dictionary<string, string>> LoadCsvData(string csvFilePath)
+        public void ShowSummary(string message)
         {
-            var records = new List<Dictionary<string, string>>();
-
-            using (var reader = new StreamReader(csvFilePath))
+            if (this.InvokeRequired)
             {
-                /*
-                // Print the first few lines of the CSV file for debugging
-                Console.WriteLine("First few lines of the CSV file:");
-                for (int i = 0; i < 5; i++)
-                {
-                    if (reader.EndOfStream) break;
-                    Console.WriteLine(reader.ReadLine());
-                }
-                */
-
-                reader.BaseStream.Seek(0, SeekOrigin.Begin); // Reset the reader to the beginning
-                reader.DiscardBufferedData();
-
-                var config = new CsvConfiguration(CultureInfo.InvariantCulture)
-                {
-                    HasHeaderRecord = true
-                };
-
-                using (var csv = new CsvReader(reader, config))
-                {
-                    csv.Read();
-                    csv.ReadHeader();
-                    var headers = csv.Context.Reader.HeaderRecord;
-                    if (headers == null)
-                    {
-                        throw new Exception("CSV file does not contain headers.");
-                    }
-
-                    // Print headers for debugging
-                    Console.WriteLine("Headers found in CSV:");
-                    foreach (var header in headers)
-                    {
-                        Console.WriteLine(header);
-                    }
-
-                    while (csv.Read())
-                    {
-                        var record = new Dictionary<string, string>();
-                        foreach (var header in headers)
-                        {
-                            record[header] = csv.GetField(header);
-                        }
-                        records.Add(record);
-                    }
-                }
-            }
-
-            return records;
-        }
-
-        private static void ProcessRecord(Dictionary<string, string> record, List<string> nameColumns, string templateDirectory, string outputDirectory)
-        {
-            // Load the template file
-            string templatePath = Path.Combine(templateDirectory, "default_template.xlsx");
-            string outputFilePath = Path.Combine(outputDirectory, GenerateOutputFileName(record));
-            File.Copy(templatePath, outputFilePath, true);
-
-            using (var document = SpreadsheetDocument.Open(outputFilePath, true))
-            {
-                var workbookPart = document.WorkbookPart;
-                var sheets = workbookPart.Workbook.Sheets.Cast<Sheet>();
-
-                foreach (var sheet in sheets)
-                {
-                    var worksheetPart = (WorksheetPart)workbookPart.GetPartById(sheet.Id);
-                    var sheetData = worksheetPart.Worksheet.Elements<SheetData>().FirstOrDefault();
-
-                    if (sheetData != null)
-                    {
-                        foreach (var row in sheetData.Elements<Row>())
-                        {
-                            foreach (var cell in row.Elements<Cell>())
-                            {
-                                if (cell.DataType != null && cell.DataType == CellValues.SharedString)
-                                {
-                                    int sharedStringIndex = int.Parse(cell.CellValue.Text);
-                                    var sharedStringItem = workbookPart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(sharedStringIndex);
-
-                                    if (sharedStringItem.Text != null)
-                                    {
-                                        // Simple text replacement
-                                        string cellText = sharedStringItem.Text.Text;
-                                        foreach (var key in record.Keys)
-                                        {
-                                            string placeholder = $"[[{key}]]";
-                                            if (cellText.Contains(placeholder))
-                                            {
-                                                cellText = cellText.Replace(placeholder, record[key]);
-                                            }
-                                        }
-                                        sharedStringItem.Text = new Text(cellText);
-                                    }
-                                    else if (sharedStringItem.Elements<Run>().Any())
-                                    {
-                                        // Handle text runs for preserving formatting
-                                        foreach (var run in sharedStringItem.Elements<Run>())
-                                        {
-                                            string runText = run.Text.Text;
-                                            foreach (var key in record.Keys)
-                                            {
-                                                string placeholder = $"[[{key}]]";
-                                                if (runText.Contains(placeholder))
-                                                {
-                                                    runText = runText.Replace(placeholder, record[key]);
-                                                }
-                                            }
-                                            run.Text = new Text(runText) { Space = SpaceProcessingModeValues.Preserve };
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        private static string GetCellValue(Cell cell, WorkbookPart workbookPart)
-        {
-            if (cell == null || cell.CellValue == null)
-            {
-                return null;
-            }
-
-            string value = cell.CellValue.InnerText;
-            if (cell.DataType != null && cell.DataType.Value == CellValues.SharedString)
-            {
-                return workbookPart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(int.Parse(value)).InnerText;
-            }
-
-            return value;
-        }
-
-        private static void SetCellValue(Cell cell, string value)
-        {
-            if (cell == null || value == null)
-            {
+                this.Invoke(new Action(() => ShowSummary(message)));
                 return;
             }
 
-            cell.CellValue = new CellValue(value);
-            cell.DataType = CellValues.String;
-        }
-
-        private static List<string> ExtractPlaceholders(string text)
-        {
-            var placeholders = new List<string>();
-            var matches = Regex.Matches(text, @"\[\[(.*?)\]\]");
-            foreach (Match match in matches)
-            {
-                placeholders.Add(match.Groups[1].Value);
-            }
-            return placeholders;
-        }
-
-        private static string GenerateOutputFileName(Dictionary<string, string> record)
-        {
-            return $"{record["Site"]} {record["Building"]} {record["Equipment"]} {record["Lineup"]} {record["Procedure"]}.xlsx";
+            statusLabel.Text = "Complete!";
+            currentFileLabel.Text = message;
+            progressBar.Value = progressBar.Maximum;
         }
     }
 }
