@@ -99,7 +99,7 @@ namespace ExcelReplacement.Services
             string result = text;
             foreach (var key in _record.Values.Keys)
             {
-                string placeholder = $"[[{key}]]";
+                string placeholder = $"[{key}]";
                 if (result.Contains(placeholder))
                 {
                     result = result.Replace(placeholder, _record.GetValue(key));

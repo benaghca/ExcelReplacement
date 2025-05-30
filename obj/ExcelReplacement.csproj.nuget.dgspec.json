@@ -1,30 +1,30 @@
 {
   "format": 1,
   "restore": {
-    "/workspaces/ExcelReplacement/ExcelReplacement.csproj": {}
+    "C:\\Users\\chris\\workspaces\\github\\benaghca\\ExcelReplacement\\ExcelReplacement.csproj": {}
   },
   "projects": {
-    "/workspaces/ExcelReplacement/ExcelReplacement.csproj": {
+    "C:\\Users\\chris\\workspaces\\github\\benaghca\\ExcelReplacement\\ExcelReplacement.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/workspaces/ExcelReplacement/ExcelReplacement.csproj",
+        "projectUniqueName": "C:\\Users\\chris\\workspaces\\github\\benaghca\\ExcelReplacement\\ExcelReplacement.csproj",
         "projectName": "ExcelReplacement",
-        "projectPath": "/workspaces/ExcelReplacement/ExcelReplacement.csproj",
-        "packagesPath": "/home/codespace/.nuget/packages/",
-        "outputPath": "/workspaces/ExcelReplacement/obj/",
+        "projectPath": "C:\\Users\\chris\\workspaces\\github\\benaghca\\ExcelReplacement\\ExcelReplacement.csproj",
+        "packagesPath": "C:\\Users\\chris\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\chris\\workspaces\\github\\benaghca\\ExcelReplacement\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/codespace/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\chris\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
-          "net8.0"
+          "net6.0-windows"
         ],
         "sources": {
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
-          "net8.0": {
-            "targetAlias": "net8.0",
+          "net6.0-windows7.0": {
+            "targetAlias": "net6.0-windows",
             "projectReferences": {}
           }
         },
@@ -37,19 +37,24 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        }
+        },
+        "SdkAnalysisLevel": "9.0.200"
       },
       "frameworks": {
-        "net8.0": {
-          "targetAlias": "net8.0",
+        "net6.0-windows7.0": {
+          "targetAlias": "net6.0-windows",
           "dependencies": {
             "CsvHelper": {
               "target": "Package",
-              "version": "[33.0.1, )"
+              "version": "[30.0.1, )"
             },
             "DocumentFormat.OpenXml": {
               "target": "Package",
-              "version": "[3.2.0, )"
+              "version": "[2.20.0, )"
+            },
+            "EPPlus": {
+              "target": "Package",
+              "version": "[7.0.8, )"
             }
           },
           "imports": [
@@ -63,12 +68,33 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[6.0.36, 6.0.36]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.win-x64",
+              "version": "[6.0.36, 6.0.36]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[6.0.36, 6.0.36]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[6.0.36, 6.0.36]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
+            },
+            "Microsoft.WindowsDesktop.App.WindowsForms": {
+              "privateAssets": "none"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/8.0.404/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.202\\RuntimeIdentifierGraph.json"
         }
       }
     }

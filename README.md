@@ -1,14 +1,14 @@
-# Excel Replacement Tool
+# Document Template Processor
 
-A Windows application that processes Excel templates by replacing placeholders with data from a CSV file.
+A Windows application that processes Excel and Word templates by replacing placeholders with data from a CSV file.
 
 ## What it does
 
 This tool allows you to:
 - Select a CSV file containing your data
-- Select an Excel template containing placeholders
+- Select an Excel or Word template containing placeholders
 - Choose an output directory
-- Generate individual Excel files for each row in your CSV
+- Generate individual files for each row in your CSV
 
 ## How to use
 
@@ -23,9 +23,11 @@ This tool allows you to:
    ```
 
 3. **Using the application**:
-   - When prompted, select your CSV file with replacement data
-   - Select your Excel template file with placeholders
+   - Select the template type (Excel or Word)
+   - Select your CSV file with replacement data
+   - Select your template file with placeholders
    - Choose an output directory for the generated files
+   - Click "Process Files" to start
    - The application will process the files and display progress
    - When complete, you'll see a summary of the processed records
 
@@ -39,7 +41,7 @@ You can distribute the application as a standalone executable that doesn't requi
    ```
 
 2. **Locate the executable**:
-   - The executable will be in the `bin\Release\net9.0-windows\win-x64\publish` directory
+   - The executable will be in the `bin\Release\net6.0-windows\win-x64\publish` directory
    - The file will be named `ExcelReplacement.exe`
 
 3. **Distribute to users**:
@@ -52,8 +54,8 @@ You can distribute the application as a standalone executable that doesn't requi
 ### CSV File
 - Must be properly formatted with headers in the first row
 - Must contain the following required fields:
-  - Site
-  - Building
+  - Location
+  - Facility
   - Equipment
   - Procedure
   - Lineup
@@ -61,22 +63,24 @@ You can distribute the application as a standalone executable that doesn't requi
 
 Example CSV format:
 ```
-Site,Building,Equipment,Procedure,Lineup,Panel-1,Breaker-1,Breaker-2
-Site1,BuildingA,Pump-01,Maintenance,Line1,MP-11,CKT-34/36/38,CKT-28/30/32
+Location,Facility,Equipment,Procedure,Lineup,Panel-1,Breaker-1,Breaker-2
+Location1,FacilityA,Equipment-01,Maintenance,Line1,MP-11,CKT-34/36/38,CKT-28/30/32
 ```
 
-### Excel Template
-- Must be a valid .xlsx file
-- Use placeholders in the format `[[FieldName]]` where FieldName matches a CSV header
-- Example placeholders: `[[FirstName]]`, `[[LastName]]`, `[[Email]]`, etc.
-- You can combine placeholders: `[[FirstName]] [[LastName]]`
+### Template Files
+- Must be a valid .xlsx (Excel) or .docx (Word) file
+- Use placeholders in the format `[FieldName]` where FieldName matches a CSV header (case-sensitive, no extra spaces)
+- Example placeholders: `[Location]`, `[Facility]`, `[Equipment]`, etc.
+- You can combine placeholders: `[Location] [Facility]`
+- Placeholders can be used anywhere in your document, including inside tables, headers, and footers
+- **Formatting is preserved:** You can use bold, italics, and other formatting in your templates. Only the replaced text will change; the rest of your formatting will remain intact.
 
 ## How it works
 
 1. The application reads the CSV file and extracts data for each row
 2. For each row, it:
-   - Creates a copy of the Excel template
-   - Finds cells containing placeholders
+   - Creates a copy of the template
+   - Finds text containing placeholders
    - Replaces placeholders with the corresponding data from the CSV
    - Saves the file with a name generated from the CSV data
    - Moves to the next row
@@ -86,11 +90,11 @@ Site1,BuildingA,Pump-01,Maintenance,Line1,MP-11,CKT-34/36/38,CKT-28/30/32
 ### Common issues
 
 1. **File not found errors**:
-   - Ensure your CSV and Excel files exist and are accessible
+   - Ensure your CSV and template files exist and are accessible
 
 2. **Format errors**:
    - Check that your CSV is properly formatted with headers
-   - Ensure your Excel template is a valid .xlsx file
+   - Ensure your template is a valid .xlsx or .docx file
 
 3. **Missing fields**:
    - Make sure your CSV contains all required fields
@@ -99,9 +103,11 @@ Site1,BuildingA,Pump-01,Maintenance,Line1,MP-11,CKT-34/36/38,CKT-28/30/32
 4. **Access denied errors**:
    - Ensure you have write permissions for the output directory
 
-5. **Placeholders not being replaced**:
-   - Make sure placeholders use the format `[[FieldName]]` with double square brackets
-   - Verify that the placeholder names exactly match the CSV header names
+5. **Placeholders not being replaced or formatting issues:**
+   - Make sure placeholders use the format `[FieldName]` with single square brackets
+   - Placeholders must match CSV headers exactly (case-sensitive, no extra spaces)
+   - Placeholders can be inside tables, headers, footers, or split across formatting (bold, italics, etc.)
+   - If you see formatting issues, ensure your template is using standard Word formatting and not special objects
 
 ## Sample files
 
@@ -110,3 +116,8 @@ The repository includes:
 - `template.xlsx`: Sample Excel template with placeholders
 
 You can use these to test the application.
+
+## New in this release
+- Placeholders are now replaced everywhere in your document, including tables, headers, and footers
+- Mixed formatting (bold, italics, etc.) is preserved when replacing placeholders
+- Output file type matches the template type (Excel or Word)
