@@ -7,6 +7,7 @@ A Windows application that processes Excel and Word templates by replacing place
 This tool allows you to:
 - Select a CSV file containing your data
 - Select an Excel or Word template containing placeholders
+- Preview and validate your template before processing
 - Choose an output directory
 - Generate individual files for each row in your CSV
 
@@ -26,10 +27,31 @@ This tool allows you to:
    - Select the template type (Excel or Word)
    - Select your CSV file with replacement data
    - Select your template file with placeholders
+   - Click "Preview Template" to validate your setup
    - Choose an output directory for the generated files
    - Click "Process Files" to start
    - The application will process the files and display progress
    - When complete, you'll see a summary of the processed records
+
+## Template Preview and Validation
+
+The preview feature helps you catch issues before processing large batches:
+
+1. **Validation Tab**:
+   - Shows all placeholders found in your template
+   - Indicates if each placeholder has a matching CSV column
+   - Displays sample values from your CSV
+   - Shows the location of each placeholder in your document
+
+2. **Preview Tab**:
+   - Shows how your template will look with the first row of data
+   - Displays content from all sheets (Excel) or sections (Word)
+   - Helps verify formatting and layout
+
+3. **Status Information**:
+   - Shows the number of errors and warnings
+   - Highlights unused CSV columns
+   - Indicates missing placeholders
 
 ## Distribution for non-developers
 
@@ -118,6 +140,10 @@ The repository includes:
 You can use these to test the application.
 
 ## New in this release
+- Template Preview and Validation feature
+  - Preview how your template will look with actual data
+  - Validate placeholders against CSV columns
+  - Catch errors before processing large batches
 - Placeholders are now replaced everywhere in your document, including tables, headers, and footers
 - Mixed formatting (bold, italics, etc.) is preserved when replacing placeholders
 - Output file type matches the template type (Excel or Word)
