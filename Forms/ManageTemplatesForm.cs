@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows.Forms;
 using ExcelReplacement.Models;
 using System.Text.Json;
+using System.ComponentModel;
 
 namespace ExcelReplacement.Forms
 {
@@ -21,7 +22,7 @@ namespace ExcelReplacement.Forms
         private TextBox searchTextBox = new();
         private Label searchLabel = new();
 
-        private List<TemplateInfo> savedTemplates = new List<TemplateInfo>();
+        private BindingList<TemplateInfo> savedTemplates = new BindingList<TemplateInfo>();
         private const string TemplatesFileName = "templates.json";
 
         public TemplateInfo? SelectedTemplate { get; private set; }
@@ -188,7 +189,6 @@ namespace ExcelReplacement.Forms
                 if (selectedRow.DataBoundItem is TemplateInfo selectedTemplate)
                 {
                     savedTemplates.Remove(selectedTemplate);
-                    savedTemplatesGrid.Rows.Remove(selectedRow);
                     SaveTemplates();
                 }
             }
@@ -233,8 +233,11 @@ namespace ExcelReplacement.Forms
                     var loadedTemplates = JsonSerializer.Deserialize<List<TemplateInfo>>(jsonString);
                     if (loadedTemplates != null)
                     {
-                        savedTemplates = loadedTemplates;
-                        // Bind the list to the DataGridView
+                        savedTemplates.Clear();
+                        foreach (var template in loadedTemplates)
+                        {
+                            savedTemplates.Add(template);
+                        }
                         savedTemplatesGrid.DataSource = savedTemplates;
                     }
                 }
@@ -249,8 +252,6 @@ namespace ExcelReplacement.Forms
         {
             try
             {
-                // Ensure savedTemplates is in sync with the grid if filtering was applied (though filtering here just hides rows)
-                // For true filtering, we might use a BindingSource. For now, rely on operations updating savedTemplates directly.
                 var jsonString = JsonSerializer.Serialize(savedTemplates);
                 File.WriteAllText(TemplatesFileName, jsonString);
             }
@@ -273,9 +274,6 @@ namespace ExcelReplacement.Forms
                 return;
             }
             savedTemplates.Add(templateInfo);
-            // Re-bind the DataSource to update the grid (simple approach)
-            savedTemplatesGrid.DataSource = null;
-            savedTemplatesGrid.DataSource = savedTemplates;
             SaveTemplates();
         }
 
