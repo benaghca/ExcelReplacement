@@ -58,6 +58,7 @@ namespace ExcelReplacement
         private ComboBox templateTypeComboBox;
         private Label statusLabel;
         private Button configureFileNameButton;
+        private Button previewButton;
         private string fileNamePattern = "[Location] [Facility] [Equipment] [Procedure]";
 
         public MainForm()
@@ -169,6 +170,15 @@ namespace ExcelReplacement
             };
             configureFileNameButton.Click += ConfigureFileNameButton_Click;
 
+            // Preview Button
+            previewButton = new Button
+            {
+                Text = "Preview Template",
+                Location = new Point(240, 200),
+                Size = new Size(120, 30)
+            };
+            previewButton.Click += PreviewButton_Click;
+
             // Process Button
             processButton = new Button
             {
@@ -200,6 +210,7 @@ namespace ExcelReplacement
                 outputDirTextBox,
                 browseOutputButton,
                 configureFileNameButton,
+                previewButton,
                 processButton,
                 statusLabel
             });
@@ -297,6 +308,33 @@ namespace ExcelReplacement
                               "Error",
                               MessageBoxButtons.OK,
                               MessageBoxIcon.Error);
+            }
+        }
+
+        private void PreviewButton_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(csvPathTextBox.Text) ||
+                string.IsNullOrEmpty(templatePathTextBox.Text))
+            {
+                MessageBox.Show("Please select both CSV and template files.", "Missing Information",
+                              MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            try
+            {
+                var previewForm = new PreviewForm();
+                previewForm.LoadPreview(
+                    templatePathTextBox.Text,
+                    csvPathTextBox.Text,
+                    templateTypeComboBox.SelectedItem.ToString() == "Excel"
+                );
+                previewForm.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error generating preview: {ex.Message}", "Error",
+                              MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
