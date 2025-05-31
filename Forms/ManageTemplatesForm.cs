@@ -11,26 +11,29 @@ namespace ExcelReplacement.Forms
 {
     public class ManageTemplatesForm : Form
     {
-        private DataGridView savedTemplatesGrid;
-        private Button removeTemplateButton;
-        private Label savedTemplatesLabel;
-        private Button selectTemplateButton;
-        private Button addTemplateButton;
-        private ComboBox templateTypeComboBox;
-        private Label templateTypeLabel;
-        private TextBox searchTextBox;
-        private Label searchLabel;
+        private DataGridView savedTemplatesGrid = new();
+        private Button removeTemplateButton = new();
+        private Label savedTemplatesLabel = new();
+        private Button selectTemplateButton = new();
+        private Button addTemplateButton = new();
+        private ComboBox templateTypeComboBox = new();
+        private Label templateTypeLabel = new();
+        private TextBox searchTextBox = new();
+        private Label searchLabel = new();
 
         private List<TemplateInfo> savedTemplates = new List<TemplateInfo>();
         private const string TemplatesFileName = "templates.json";
 
-        public TemplateInfo SelectedTemplate { get; private set; }
+        public TemplateInfo? SelectedTemplate { get; private set; }
 
         public ManageTemplatesForm()
         {
             InitializeComponents();
             LoadTemplates();
             this.FormClosing += ManageTemplatesForm_FormClosing;
+            
+            // Apply theme
+            ThemeManager.ApplyTheme(this);
         }
 
         private void InitializeComponents()
@@ -153,7 +156,7 @@ namespace ExcelReplacement.Forms
             this.Controls.Add(tableLayoutPanel);
         }
 
-        private void AddTemplateButton_Click(object sender, EventArgs e)
+        private void AddTemplateButton_Click(object? sender, EventArgs e)
         {
             using (var dialog = new OpenFileDialog())
             {
@@ -172,7 +175,7 @@ namespace ExcelReplacement.Forms
             }
         }
 
-        private void RemoveTemplateButton_Click(object sender, EventArgs e)
+        private void RemoveTemplateButton_Click(object? sender, EventArgs e)
         {
             RemoveSelectedTemplate();
         }
@@ -195,7 +198,7 @@ namespace ExcelReplacement.Forms
             }
         }
 
-        private void SavedTemplatesGrid_SelectionChanged(object sender, EventArgs e)
+        private void SavedTemplatesGrid_SelectionChanged(object? sender, EventArgs e)
         {
             if (savedTemplatesGrid.SelectedRows.Count > 0)
             {
@@ -257,7 +260,7 @@ namespace ExcelReplacement.Forms
             }
         }
 
-        private void ManageTemplatesForm_FormClosing(object sender, FormClosingEventArgs e)
+        private void ManageTemplatesForm_FormClosing(object? sender, FormClosingEventArgs e)
         {
             SaveTemplates(); // Always save on closing
         }
@@ -276,7 +279,7 @@ namespace ExcelReplacement.Forms
             SaveTemplates();
         }
 
-        private void SearchTextBox_TextChanged(object sender, EventArgs e)
+        private void SearchTextBox_TextChanged(object? sender, EventArgs e)
         {
             string searchText = searchTextBox.Text.ToLower();
 

@@ -32,8 +32,8 @@ namespace ExcelReplacement.Forms
         {
             this.Text = "Template Preview and Validation";
             this.Size = new Size(1200, 800);
-            this.FormBorderStyle = FormBorderStyle.FixedDialog;
-            this.StartPosition = FormStartPosition.CenterScreen;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.MaximizeBox = false;
             this.MinimumSize = new Size(1000, 700);
 
@@ -43,92 +43,96 @@ namespace ExcelReplacement.Forms
             _showOnlyMarked = false;
 
             // Initialize components
-            _tabControl = new TabControl
+            _tabControl = new System.Windows.Forms.TabControl
             {
-                Dock = DockStyle.Fill,
-                Padding = new Point(10, 10),
-                Margin = new Padding(10)
+                Dock = System.Windows.Forms.DockStyle.Fill,
+                Padding = new System.Drawing.Point(10, 10),
+                Margin = new System.Windows.Forms.Padding(10)
             };
 
-            _validationTab = new TabPage("Validation");
-            _previewTab = new TabPage("Preview");
+            _validationTab = new System.Windows.Forms.TabPage("Validation");
+            _previewTab = new System.Windows.Forms.TabPage("Preview");
 
-            _placeholdersGrid = new DataGridView
+            _placeholdersGrid = new System.Windows.Forms.DataGridView
             {
-                Dock = DockStyle.Fill,
+                Dock = System.Windows.Forms.DockStyle.Fill,
                 AllowUserToAddRows = false,
                 AllowUserToDeleteRows = false,
                 ReadOnly = true,
-                SelectionMode = DataGridViewSelectionMode.FullRowSelect,
+                SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect,
                 MultiSelect = false,
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
-                Margin = new Padding(5)
+                AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill,
+                Margin = new System.Windows.Forms.Padding(5),
+                // Revert DataGridView styling to default, let ThemeManager handle it
+                EnableHeadersVisualStyles = true, 
+                RowHeadersVisible = true, 
+                RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.EnableResizing,
             };
 
             // Initialize preview components
-            _previewSplitContainer = new SplitContainer
+            _previewSplitContainer = new System.Windows.Forms.SplitContainer
             {
-                Dock = DockStyle.Fill,
-                Orientation = Orientation.Vertical,
+                Dock = System.Windows.Forms.DockStyle.Fill,
+                Orientation = System.Windows.Forms.Orientation.Vertical,
                 SplitterDistance = 300,
-                Margin = new Padding(5),
-                Panel1 = { Padding = new Padding(5) },
-                Panel2 = { Padding = new Padding(5) }
+                Margin = new System.Windows.Forms.Padding(5),
+                Panel1 = { Padding = new System.Windows.Forms.Padding(5) },
+                Panel2 = { Padding = new System.Windows.Forms.Padding(5) }
             };
 
             // Create search panel
-            var searchPanel = new Panel
+            var searchPanel = new System.Windows.Forms.Panel
             {
-                Dock = DockStyle.Top,
+                Dock = System.Windows.Forms.DockStyle.Top,
                 Height = 45,
-                Padding = new Padding(5),
-                Margin = new Padding(0, 0, 0, 5)
+                Padding = new System.Windows.Forms.Padding(5),
+                Margin = new System.Windows.Forms.Padding(0, 0, 0, 5)
             };
 
-            _searchBox = new TextBox
+            _searchBox = new System.Windows.Forms.TextBox
             {
-                Dock = DockStyle.Fill,
+                Dock = System.Windows.Forms.DockStyle.Fill,
                 PlaceholderText = "Search records...",
-                Font = new Font("Segoe UI", 10),
-                Margin = new Padding(0, 0, 5, 0)
+                Font = new System.Drawing.Font("Consolas", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0))),
+                Margin = new System.Windows.Forms.Padding(0, 0, 5, 0)
             };
             _searchBox.TextChanged += SearchBox_TextChanged;
 
-            _clearSearchButton = new Button
+            _clearSearchButton = new System.Windows.Forms.Button
             {
-                Dock = DockStyle.Right,
+                Dock = System.Windows.Forms.DockStyle.Right,
                 Width = 80,
                 Text = "Clear",
                 Enabled = false,
-                Margin = new Padding(5, 0, 0, 0)
+                Margin = new System.Windows.Forms.Padding(5, 0, 0, 0)
             };
             _clearSearchButton.Click += ClearSearchButton_Click;
 
-            _showMarkedButton = new Button
+            _showMarkedButton = new System.Windows.Forms.Button
             {
-                Dock = DockStyle.Right,
+                Dock = System.Windows.Forms.DockStyle.Right,
                 Width = 100,
                 Text = "Show Marked",
-                Margin = new Padding(5, 0, 0, 0)
+                Margin = new System.Windows.Forms.Padding(5, 0, 0, 0)
             };
             _showMarkedButton.Click += ShowMarkedButton_Click;
 
-            searchPanel.Controls.AddRange(new Control[] { _searchBox, _clearSearchButton, _showMarkedButton });
+            searchPanel.Controls.AddRange(new System.Windows.Forms.Control[] { _searchBox, _clearSearchButton, _showMarkedButton });
 
             // Initialize ListView with images
-            _listViewImageList = new ImageList();
-            _listViewImageList.Images.Add("normal", CreateCircleImage(Color.Transparent));
-            _listViewImageList.Images.Add("marked", CreateCircleImage(Color.Yellow));
+            _listViewImageList = new System.Windows.Forms.ImageList();
+            _listViewImageList.Images.Add("normal", CreateCircleImage(System.Drawing.Color.Transparent));
+            _listViewImageList.Images.Add("marked", CreateCircleImage(System.Drawing.Color.Yellow));
 
-            _recordsListView = new ListView
+            _recordsListView = new System.Windows.Forms.ListView
             {
-                Dock = DockStyle.Fill,
-                View = View.Details,
+                Dock = System.Windows.Forms.DockStyle.Fill,
+                View = System.Windows.Forms.View.Details,
                 FullRowSelect = true,
                 GridLines = false,
                 MultiSelect = false,
                 SmallImageList = _listViewImageList,
-                Margin = new Padding(0)
+                Margin = new System.Windows.Forms.Padding(0)
             };
             _recordsListView.Columns.Add("Record", 280);
             _recordsListView.SelectedIndexChanged += RecordsListView_SelectedIndexChanged;
@@ -136,18 +140,18 @@ namespace ExcelReplacement.Forms
             _recordsListView.MouseClick += RecordsListView_MouseClick;
 
             // Create a container panel for the left side using TableLayoutPanel for better control
-            var leftPanel = new TableLayoutPanel
+            var leftPanel = new System.Windows.Forms.TableLayoutPanel
             {
-                Dock = DockStyle.Fill,
+                Dock = System.Windows.Forms.DockStyle.Fill,
                 ColumnCount = 1,
                 RowCount = 2,
-                Padding = new Padding(0),
-                Margin = new Padding(0),
+                Padding = new System.Windows.Forms.Padding(0),
+                Margin = new System.Windows.Forms.Padding(0),
                 // Define row styles: first row for search panel (auto-size), second for list view (fills remaining space)
                 RowStyles =
                 {
-                    new RowStyle(SizeType.AutoSize),
-                    new RowStyle(SizeType.Percent, 100F)
+                    new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.AutoSize),
+                    new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F)
                 }
             };
 
@@ -155,63 +159,66 @@ namespace ExcelReplacement.Forms
             leftPanel.Controls.Add(searchPanel, 0, 0); // Add searchPanel to cell (0, 0)
             leftPanel.Controls.Add(_recordsListView, 0, 1); // Add _recordsListView to cell (0, 1)
 
-            _previewTextBox = new RichTextBox
+            _previewTextBox = new System.Windows.Forms.RichTextBox
             {
-                Dock = DockStyle.Fill,
+                Dock = System.Windows.Forms.DockStyle.Fill,
                 ReadOnly = true,
-                Font = new Font("Consolas", 10),
-                Margin = new Padding(0, 5, 0, 0)
+                Font = new System.Drawing.Font("Consolas", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0))),
+                Margin = new System.Windows.Forms.Padding(0, 5, 0, 0)
             };
 
             _previewSplitContainer.Panel1.Controls.Add(leftPanel);
             _previewSplitContainer.Panel2.Controls.Add(_previewTextBox);
 
             // Create bottom panel for status and close button
-            var bottomPanel = new Panel
+            var bottomPanel = new System.Windows.Forms.Panel
             {
-                Dock = DockStyle.Bottom,
+                Dock = System.Windows.Forms.DockStyle.Bottom,
                 Height = 80,
-                Padding = new Padding(10)
+                Padding = new System.Windows.Forms.Padding(10)
             };
 
-            _closeButton = new Button
+            _closeButton = new System.Windows.Forms.Button
             {
                 Text = "Close",
-                DialogResult = DialogResult.OK,
-                Dock = DockStyle.Right,
+                DialogResult = System.Windows.Forms.DialogResult.OK,
+                Dock = System.Windows.Forms.DockStyle.Right,
                 Width = 100,
                 Height = 35
             };
 
-            _statusLabel = new Label
+            _statusLabel = new System.Windows.Forms.Label
             {
-                Dock = DockStyle.Fill,
-                TextAlign = ContentAlignment.MiddleLeft,
-                Padding = new Padding(10, 0, 0, 0),
+                Dock = System.Windows.Forms.DockStyle.Fill,
+                TextAlign = System.Drawing.ContentAlignment.MiddleLeft,
+                Padding = new System.Windows.Forms.Padding(10, 0, 0, 0),
                 AutoSize = false
             };
 
-            bottomPanel.Controls.AddRange(new Control[] { _statusLabel, _closeButton });
+            bottomPanel.Controls.AddRange(new System.Windows.Forms.Control[] { _statusLabel, _closeButton });
 
             // Setup grid columns
-            _placeholdersGrid.Columns.AddRange(new DataGridViewColumn[]
+            _placeholdersGrid.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[]
             {
-                new DataGridViewTextBoxColumn { Name = "Placeholder", HeaderText = "Placeholder" },
-                new DataGridViewTextBoxColumn { Name = "Status", HeaderText = "Status" },
-                new DataGridViewTextBoxColumn { Name = "Message", HeaderText = "Message" },
-                new DataGridViewTextBoxColumn { Name = "SampleValue", HeaderText = "Sample Value" },
-                new DataGridViewTextBoxColumn { Name = "Location", HeaderText = "Location" }
+                new System.Windows.Forms.DataGridViewTextBoxColumn { Name = "Placeholder", HeaderText = "Placeholder" },
+                new System.Windows.Forms.DataGridViewTextBoxColumn { Name = "Status", HeaderText = "Status" },
+                new System.Windows.Forms.DataGridViewTextBoxColumn { Name = "Message", HeaderText = "Message" },
+                new System.Windows.Forms.DataGridViewTextBoxColumn { Name = "SampleValue", HeaderText = "Sample Value" },
+                new System.Windows.Forms.DataGridViewTextBoxColumn { Name = "Location", HeaderText = "Location" }
             });
 
             // Add controls to form
             _validationTab.Controls.Add(_placeholdersGrid);
             _previewTab.Controls.Add(_previewSplitContainer);
-            _tabControl.TabPages.AddRange(new TabPage[] { _validationTab, _previewTab });
+            _tabControl.TabPages.AddRange(new System.Windows.Forms.TabPage[] { _validationTab, _previewTab });
 
-            this.Controls.AddRange(new Control[] { _tabControl, bottomPanel });
+            this.Controls.AddRange(new System.Windows.Forms.Control[] { _tabControl, bottomPanel });
+
+            // Apply theme - this should now correctly style controls without conflicting custom code
+            ThemeManager.ApplyTheme(this);
         }
 
-        private void ShowMarkedButton_Click(object sender, EventArgs e)
+        private void ShowMarkedButton_Click(object? sender, EventArgs e)
         {
             _showOnlyMarked = !_showOnlyMarked;
             _showMarkedButton.Text = _showOnlyMarked ? "Show All" : "Show Marked";
@@ -224,7 +231,7 @@ namespace ExcelReplacement.Forms
             _clearSearchButton.Enabled = !string.IsNullOrWhiteSpace(searchText);
 
             // Create a temporary list of ListViewItems that should be visible
-            var itemsToShow = new List<ListViewItem>();
+            var itemsToShow = new List<System.Windows.Forms.ListViewItem>();
 
             for (int i = 0; i < _records.Count; i++)
             {
@@ -242,7 +249,7 @@ namespace ExcelReplacement.Forms
                     // This requires a way to link ListViewItem back to the original record index
                     // Let's store the original index in the ListViewItem's Tag property
                     var existingItem = _recordsListView.Items
-                        .Cast<ListViewItem>()
+                        .Cast<System.Windows.Forms.ListViewItem>()
                         .FirstOrDefault(item => item.Tag is int originalIndex && originalIndex == i);
 
                     if (existingItem != null)
@@ -254,10 +261,10 @@ namespace ExcelReplacement.Forms
                     else
                     {
                         // Create a new item for this record
-                        var newItem = new ListViewItem(label)
+                        var newItem = new System.Windows.Forms.ListViewItem(label)
                         {
                             ImageKey = _markedRecords.Contains(i) ? "marked" : "normal",
-                            Tag = i // Store the original record index
+                            Tag = i // Store original index in Tag
                         };
                         itemsToShow.Add(newItem);
                     }
@@ -280,14 +287,14 @@ namespace ExcelReplacement.Forms
             UpdateStatusLabel();
         }
 
-        private Image CreateCircleImage(Color color)
+        private System.Drawing.Image CreateCircleImage(System.Drawing.Color color)
         {
-            var image = new Bitmap(16, 16);
-            using (var g = Graphics.FromImage(image))
+            var image = new System.Drawing.Bitmap(16, 16);
+            using (var g = System.Drawing.Graphics.FromImage(image))
             {
                 g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-                g.Clear(Color.Transparent);
-                using (var brush = new SolidBrush(color))
+                g.Clear(System.Drawing.Color.Transparent);
+                using (System.Drawing.Brush brush = new System.Drawing.SolidBrush(color))
                 {
                     g.FillEllipse(brush, 2, 2, 12, 12);
                 }
@@ -295,9 +302,9 @@ namespace ExcelReplacement.Forms
             return image;
         }
 
-        private void RecordsListView_MouseClick(object sender, MouseEventArgs e)
+        private void RecordsListView_MouseClick(object? sender, System.Windows.Forms.MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Right)
+            if (e.Button == System.Windows.Forms.MouseButtons.Right)
             {
                 var hit = _recordsListView.GetItemAt(e.X, e.Y);
                 if (hit != null && hit.Tag is int originalIndex)
@@ -320,9 +327,9 @@ namespace ExcelReplacement.Forms
             ApplyFilters(); // Re-apply filters to update the list view appearance
         }
 
-        private void RecordsListView_KeyDown(object sender, KeyEventArgs e)
+        private void RecordsListView_KeyDown(object? sender, System.Windows.Forms.KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Space && _recordsListView.SelectedItems.Count > 0)
+            if (e.KeyCode == System.Windows.Forms.Keys.Space && _recordsListView.SelectedItems.Count > 0)
             {
                 var selectedItem = _recordsListView.SelectedItems[0];
                 if (selectedItem.Tag is int originalIndex)
@@ -331,19 +338,19 @@ namespace ExcelReplacement.Forms
                     e.Handled = true;
                 }
             }
-            else if (e.KeyCode == Keys.Up || e.KeyCode == Keys.Down)
+            else if (e.KeyCode == System.Windows.Forms.Keys.Up || e.KeyCode == System.Windows.Forms.Keys.Down)
             {
                 // Let the default ListView navigation handle it
                 return;
             }
         }
 
-        private void SearchBox_TextChanged(object sender, EventArgs e)
+        private void SearchBox_TextChanged(object? sender, EventArgs e)
         {
             ApplyFilters();
         }
 
-        private void ClearSearchButton_Click(object sender, EventArgs e)
+        private void ClearSearchButton_Click(object? sender, EventArgs e)
         {
             _searchBox.Clear();
             ApplyFilters();
@@ -351,13 +358,13 @@ namespace ExcelReplacement.Forms
 
         private void UpdateStatusLabel()
         {
-            var baseText = _statusLabel.Text.Split(new[] { " | " }, StringSplitOptions.None)[0];
+            var baseText = _statusLabel.Text.Split(new[] { " | " }, System.StringSplitOptions.None)[0];
             var markedCount = _markedRecords.Count;
             var visibleCount = _recordsListView.Items.Count;
             _statusLabel.Text = $"{baseText} | {markedCount} record(s) marked for review | {visibleCount} record(s) visible";
         }
 
-        private void RecordsListView_SelectedIndexChanged(object sender, EventArgs e)
+        private void RecordsListView_SelectedIndexChanged(object? sender, EventArgs e)
         {
             if (_recordsListView.SelectedItems.Count > 0)
             {
@@ -406,15 +413,15 @@ namespace ExcelReplacement.Forms
                     var record = _records[i];
                     // Create a descriptive label for each record using key fields
                     var label = string.Join(" - ", record.Values.Take(3).Select(kv => $"{kv.Key}: {kv.Value}"));
-                    var item = new ListViewItem(label) { ImageKey = "normal", Tag = i }; // Store original index in Tag
+                    var item = new System.Windows.Forms.ListViewItem(label) { ImageKey = "normal", Tag = i }; // Store original index in Tag
                     _recordsListView.Items.Add(item);
                 }
 
                 // Manually resize the column to fit the content after items are added
                 int maxColumnWidth = 0;
-                using (Graphics g = _recordsListView.CreateGraphics())
+                using (System.Drawing.Graphics g = _recordsListView.CreateGraphics())
                 {
-                    foreach (ListViewItem item in _recordsListView.Items)
+                    foreach (System.Windows.Forms.ListViewItem item in _recordsListView.Items)
                     {
                         int itemWidth = (int)g.MeasureString(item.Text, _recordsListView.Font).Width;
                         if (itemWidth > maxColumnWidth)
@@ -442,20 +449,20 @@ namespace ExcelReplacement.Forms
                         result.Location
                     )];
 
-                    // Apply color based on status
+                    // Apply color based on status - set text color, background is handled by theme
                     switch (result.Status)
                     {
                         case ValidationStatus.Success:
-                            row.DefaultCellStyle.BackColor = Color.LightGreen;
+                            row.DefaultCellStyle.ForeColor = ThemeManager.SuccessColor; // Green text
                             break;
                         case ValidationStatus.Warning:
-                            row.DefaultCellStyle.BackColor = Color.LightYellow;
+                            row.DefaultCellStyle.ForeColor = ThemeManager.WarningColor; // Yellow text
                             break;
                         case ValidationStatus.Error:
-                            row.DefaultCellStyle.BackColor = Color.Salmon;
+                            row.DefaultCellStyle.ForeColor = ThemeManager.ErrorColor; // Red text
                             break;
                         case ValidationStatus.CsvColumnUnused:
-                            row.DefaultCellStyle.BackColor = Color.LightBlue;
+                            row.DefaultCellStyle.ForeColor = ThemeManager.InfoColor; // Blue text
                             break;
                     }
                 }
@@ -467,12 +474,12 @@ namespace ExcelReplacement.Forms
                 var errorCount = validationResults.Count(r => r.Status.ToString() == "Error");
                 var warningCount = validationResults.Count(r => r.Status.ToString() == "Warning");
                 _statusLabel.Text = $"Found {errorCount} errors and {warningCount} warnings. {_records.Count} records available for preview.";
-                _statusLabel.ForeColor = errorCount > 0 ? Color.Red : warningCount > 0 ? Color.Orange : Color.Green;
+                _statusLabel.ForeColor = errorCount > 0 ? ThemeManager.ErrorColor : warningCount > 0 ? ThemeManager.WarningColor : ThemeManager.SuccessColor;
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading preview: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                this.DialogResult = DialogResult.Cancel;
+                System.Windows.Forms.MessageBox.Show($"Error loading preview: {ex.Message}", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                this.DialogResult = System.Windows.Forms.DialogResult.Cancel;
                 this.Close();
             }
         }

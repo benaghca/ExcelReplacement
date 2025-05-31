@@ -14,9 +14,275 @@ using ExcelReplacement.Services;
 using System.Windows.Forms;
 using System.Drawing;
 using ExcelReplacement.Forms;
+using System.Threading.Tasks;
 
 namespace ExcelReplacement
 {
+    public static class ThemeManager
+    {
+        // Classic terminal colors with improved readability
+        public static System.Drawing.Color BackgroundColor = System.Drawing.Color.FromArgb(0, 0, 0); // Pure black background
+        public static System.Drawing.Color ForegroundColor = System.Drawing.Color.FromArgb(0, 255, 128); // Brighter green for better readability
+        public static System.Drawing.Color AccentColor = System.Drawing.Color.FromArgb(0, 255, 192); // Even brighter green for accents
+        public static System.Drawing.Color ControlBackgroundColor = System.Drawing.Color.FromArgb(0, 0, 0); // Keep controls black
+        public static System.Drawing.Color BorderColor = System.Drawing.Color.FromArgb(0, 192, 0); // Brighter green for borders
+        public static System.Drawing.Color GridBackgroundColor = System.Drawing.Color.FromArgb(0, 0, 0); // Black grid background
+        public static System.Drawing.Color GridHeaderColor = System.Drawing.Color.FromArgb(0, 96, 0); // Darker green for headers
+        public static System.Drawing.Color SelectionColor = System.Drawing.Color.FromArgb(0, 192, 0); // Brighter green for selection
+
+        // Status colors in terminal style with improved contrast
+        public static System.Drawing.Color SuccessColor = System.Drawing.Color.FromArgb(0, 255, 128); // Bright green
+        public static System.Drawing.Color WarningColor = System.Drawing.Color.FromArgb(255, 255, 0); // Yellow
+        public static System.Drawing.Color ErrorColor = System.Drawing.Color.FromArgb(255, 64, 64); // Softer red
+        public static System.Drawing.Color InfoColor = System.Drawing.Color.FromArgb(64, 192, 255); // Softer blue for info
+
+        // Hover and active states with better visibility
+        public static System.Drawing.Color HoverColor = System.Drawing.Color.FromArgb(0, 96, 0); // Dark green
+        public static System.Drawing.Color ActiveColor = System.Drawing.Color.FromArgb(0, 128, 0); // Medium green
+
+        public static void ApplyTheme(System.Windows.Forms.Form form)
+        {
+            form.BackColor = BackgroundColor;
+            form.ForeColor = ForegroundColor;
+
+            foreach (System.Windows.Forms.Control control in form.Controls)
+            {
+                ApplyThemeToControl(control);
+            }
+        }
+
+        private static void ApplyThemeToControl(System.Windows.Forms.Control control)
+        {
+            if (control is System.Windows.Forms.Button button)
+            {
+                button.BackColor = ControlBackgroundColor;
+                button.ForeColor = ForegroundColor;
+                button.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+                button.FlatAppearance.BorderColor = BorderColor;
+                button.FlatAppearance.MouseOverBackColor = HoverColor;
+                button.FlatAppearance.MouseDownBackColor = ActiveColor;
+                button.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            }
+            else if (control is System.Windows.Forms.TextBox textBox)
+            {
+                textBox.BackColor = ControlBackgroundColor;
+                textBox.ForeColor = ForegroundColor;
+                textBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+                textBox.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            }
+            else if (control is System.Windows.Forms.ComboBox comboBox)
+            {
+                comboBox.BackColor = ControlBackgroundColor;
+                comboBox.ForeColor = ForegroundColor;
+                comboBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+                comboBox.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            }
+            else if (control is System.Windows.Forms.DataGridView grid)
+            {
+                grid.BackgroundColor = GridBackgroundColor;
+                grid.ForeColor = ForegroundColor;
+                grid.BorderStyle = System.Windows.Forms.BorderStyle.None;
+                grid.ColumnHeadersDefaultCellStyle.BackColor = GridHeaderColor;
+                grid.ColumnHeadersDefaultCellStyle.ForeColor = ForegroundColor;
+                grid.ColumnHeadersDefaultCellStyle.SelectionBackColor = ActiveColor;
+                grid.ColumnHeadersDefaultCellStyle.SelectionForeColor = ForegroundColor;
+                grid.DefaultCellStyle.BackColor = GridBackgroundColor;
+                grid.DefaultCellStyle.ForeColor = ForegroundColor;
+                grid.DefaultCellStyle.SelectionBackColor = GridBackgroundColor;
+                grid.DefaultCellStyle.SelectionForeColor = ForegroundColor;
+                grid.DefaultCellStyle.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+                grid.ColumnHeadersDefaultCellStyle.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+                grid.EnableHeadersVisualStyles = false;
+                
+                grid.CellBorderStyle = DataGridViewCellBorderStyle.Single;
+                grid.DefaultCellStyle.SelectionBackColor = GridBackgroundColor;
+                grid.DefaultCellStyle.SelectionForeColor = ForegroundColor;
+                
+                grid.CellPainting += (sender, e) =>
+                {
+                    // Paint row header
+                    if (e.RowIndex >= 0 && e.ColumnIndex == -1)
+                    {
+                        // Manually paint the background with the desired color
+                        using (var brush = new System.Drawing.SolidBrush(GridBackgroundColor))
+                        {
+                            e.Graphics.FillRectangle(brush, e.CellBounds);
+                        }
+
+                        // Draw the triangle/arrow for the selected row header
+                        if (grid.Rows[e.RowIndex].Selected)
+                        {
+                            int triangleSize = 6;
+                            int x = e.CellBounds.Left + (e.CellBounds.Width - triangleSize) / 2;
+                            int y = e.CellBounds.Top + (e.CellBounds.Height - triangleSize) / 2;
+                            Point[] trianglePoints = new Point[]
+                            {
+                                new Point(x, y),
+                                new Point(x + triangleSize, y + triangleSize / 2),
+                                new Point(x, y + triangleSize)
+                            };
+                            using (var brush = new System.Drawing.SolidBrush(SelectionColor))
+                            {
+                                e.Graphics.FillPolygon(brush, trianglePoints);
+                            }
+                        }
+
+                        // Optionally draw row number if RowHeadersVisible is true
+                        // if (grid.RowHeadersVisible)
+                        // {
+                        //     using (var sf = new StringFormat() { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
+                        //     using (var brush = new SolidBrush(ForegroundColor))
+                        //     {
+                        //         e.Graphics.DrawString((e.RowIndex + 1).ToString(), e.CellStyle.Font, brush, e.CellBounds, sf);
+                        //     }
+                        // }
+
+                        // Draw border for selected row header
+                         if (grid.Rows[e.RowIndex].Selected)
+                         {
+                            using (var pen = new System.Drawing.Pen(SelectionColor, 2))
+                            {
+                                e.Graphics.DrawRectangle(pen, new System.Drawing.Rectangle(
+                                    e.CellBounds.X,
+                                    e.CellBounds.Y,
+                                    e.CellBounds.Width - 1,
+                                    e.CellBounds.Height - 1));
+                            }
+                         }
+
+                        e.Handled = true;
+                    }
+                    // Paint data cells
+                    else if (e.RowIndex >= 0 && e.ColumnIndex >= 0)
+                    {
+                        var cell = grid.Rows[e.RowIndex].Cells[e.ColumnIndex];
+                        if (cell.Selected)
+                        {
+                            e.Paint(e.CellBounds, DataGridViewPaintParts.All);
+                            using (var pen = new System.Drawing.Pen(SelectionColor, 2))
+                            {
+                                e.Graphics.DrawRectangle(pen, new System.Drawing.Rectangle(
+                                    e.CellBounds.X,
+                                    e.CellBounds.Y,
+                                    e.CellBounds.Width - 1,
+                                    e.CellBounds.Height - 1));
+                            }
+                            e.Handled = true;
+                        }
+                    }
+                };
+            }
+            else if (control is System.Windows.Forms.ListView listView)
+            {
+                listView.BackColor = ControlBackgroundColor;
+                listView.ForeColor = ForegroundColor;
+                listView.BorderStyle = System.Windows.Forms.BorderStyle.None;
+                listView.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            }
+            else if (control is System.Windows.Forms.RichTextBox richTextBox)
+            {
+                richTextBox.BackColor = ControlBackgroundColor;
+                richTextBox.ForeColor = ForegroundColor;
+                richTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+                richTextBox.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            }
+            else if (control is System.Windows.Forms.Label label)
+            {
+                label.ForeColor = ForegroundColor;
+                label.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            }
+            else if (control is System.Windows.Forms.ProgressBar progressBar)
+            {
+                progressBar.BackColor = ControlBackgroundColor;
+                progressBar.ForeColor = AccentColor;
+            }
+            else if (control is System.Windows.Forms.TabControl tabControl)
+            {
+                tabControl.BackColor = BackgroundColor;
+                tabControl.ForeColor = ForegroundColor;
+                tabControl.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+                
+                // Custom drawing for TabControl tabs
+                tabControl.DrawMode = TabDrawMode.OwnerDrawFixed;
+                tabControl.Padding = new Point(6, 4);
+                tabControl.ItemSize = new Size(tabControl.ItemSize.Width, 20);
+                tabControl.Appearance = TabAppearance.FlatButtons;
+                tabControl.Region = new Region(new RectangleF(0, 0, tabControl.Width, tabControl.Height));
+
+                tabControl.DrawItem += (sender, e) =>
+                {
+                    var tabControl = (System.Windows.Forms.TabControl)sender;
+                    var tabPage = tabControl.TabPages[e.Index];
+                    var tabBounds = e.Bounds;
+
+                    // Determine colors based on selection state and theme
+                    var backColor = tabControl.SelectedIndex == e.Index ? ActiveColor : BackgroundColor;
+                    var foreColor = ForegroundColor;
+
+                    // Draw background
+                    using (var brush = new System.Drawing.SolidBrush(backColor))
+                    {
+                        e.Graphics.FillRectangle(brush, tabBounds);
+                    }
+
+                    // Draw tab text
+                    System.Windows.Forms.TextRenderer.DrawText(
+                        e.Graphics,
+                        tabPage.Text,
+                        tabControl.Font,
+                        tabBounds,
+                        foreColor,
+                        TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter
+                    );
+
+                    // Draw border for selected tab
+                    if (tabControl.SelectedIndex == e.Index)
+                    {
+                        using (var pen = new System.Drawing.Pen(SelectionColor, 2))
+                        {
+                            e.Graphics.DrawRectangle(pen, new System.Drawing.Rectangle(
+                                tabBounds.X,
+                                tabBounds.Y,
+                                tabBounds.Width - 1,
+                                tabBounds.Height - 1));
+                        }
+                    }
+                };
+
+                foreach (System.Windows.Forms.TabPage page in tabControl.TabPages)
+                {
+                    page.BackColor = BackgroundColor;
+                    page.ForeColor = ForegroundColor;
+                    page.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+                }
+            }
+            else if (control is System.Windows.Forms.SplitContainer splitContainer)
+            {
+                splitContainer.BackColor = BackgroundColor;
+                splitContainer.Panel1.BackColor = BackgroundColor;
+                splitContainer.Panel2.BackColor = BackgroundColor;
+            }
+            else if (control is System.Windows.Forms.TableLayoutPanel tableLayout)
+            {
+                tableLayout.BackColor = BackgroundColor;
+            }
+            else if (control is System.Windows.Forms.FlowLayoutPanel flowLayout)
+            {
+                flowLayout.BackColor = BackgroundColor;
+            }
+            else if (control is System.Windows.Forms.Panel panel)
+            {
+                panel.BackColor = BackgroundColor;
+            }
+
+            // Recursively apply theme to child controls
+            foreach (System.Windows.Forms.Control childControl in control.Controls)
+            {
+                ApplyThemeToControl(childControl);
+            }
+        }
+    }
+
     internal class Program
     {
         private static readonly CsvService _csvService = new();
@@ -30,7 +296,14 @@ namespace ExcelReplacement
             {
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
-                Application.Run(new MainForm());
+                
+                // Set console-style icon
+                var icon = CreateConsoleIcon();
+                
+                var mainForm = new MainForm();
+                mainForm.Icon = icon;
+                ThemeManager.ApplyTheme(mainForm);
+                Application.Run(mainForm);
             }
             catch (Exception ex)
             {
@@ -40,6 +313,26 @@ namespace ExcelReplacement
                               MessageBoxIcon.Error);
             }
         }
+
+        private static Icon CreateConsoleIcon()
+        {
+            // Create a 32x32 bitmap for the icon
+            using var bitmap = new System.Drawing.Bitmap(32, 32);
+            using var g = System.Drawing.Graphics.FromImage(bitmap);
+            
+            // Fill background
+            g.Clear(System.Drawing.Color.Black);
+            
+            // Draw console-style text
+            using var font = new System.Drawing.Font("Consolas", 16, System.Drawing.FontStyle.Bold);
+            using var brush = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(0, 255, 128)); // Terminal green
+            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
+            g.DrawString(">", font, brush, 4, 4);
+            
+            // Convert to icon
+            var handle = bitmap.GetHicon();
+            return System.Drawing.Icon.FromHandle(handle);
+        }
     }
 
     public class MainForm : Form
@@ -47,22 +340,20 @@ namespace ExcelReplacement
         private readonly CsvService _csvService = new();
         private readonly ExcelService _excelService = new();
         private readonly WordService _wordService = new();
-        private TextBox csvPathTextBox;
-        private TextBox templatePathTextBox;
-        private TextBox outputDirTextBox;
-        private Button browseCsvButton;
-        private Button browseTemplateButton;
-        private Button browseOutputButton;
-        private Button processButton;
-        private ProgressForm progressForm;
-        private ComboBox templateTypeComboBox;
-        private Label statusLabel;
-        private Button configureFileNameButton;
-        private Button previewButton;
+        private TextBox csvPathTextBox = new();
+        private TextBox templatePathTextBox = new();
+        private TextBox outputDirTextBox = new();
+        private Button browseCsvButton = new();
+        private Button browseTemplateButton = new();
+        private Button browseOutputButton = new();
+        private Button processButton = new();
+        private ProgressForm progressForm = new();
+        private ComboBox templateTypeComboBox = new();
+        private Label statusLabel = new();
+        private Button configureFileNameButton = new();
+        private Button previewButton = new();
         private string fileNamePattern = "[Location] [Facility] [Equipment] [Procedure]";
-
-        // Add the new Manage Templates button
-        private Button manageTemplatesButton;
+        private Button manageTemplatesButton = new();
 
         public MainForm()
         {
@@ -287,68 +578,77 @@ namespace ExcelReplacement
             this.Controls.Add(tableLayoutPanel);
         }
 
-        private void TemplateTypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        private void TemplateTypeComboBox_SelectedIndexChanged(object? sender, EventArgs e)
         {
             UpdateTemplateFileFilter();
         }
 
         private void UpdateTemplateFileFilter()
         {
-            string filter = templateTypeComboBox.SelectedItem.ToString() == "Excel"
+            string filter = templateTypeComboBox.SelectedItem?.ToString() == "Excel"
                 ? "Excel files (*.xlsx)|*.xlsx|All files (*.*)|*.*"
                 : "Word files (*.docx)|*.docx|All files (*.*)|*.*";
             
             templatePathTextBox.Text = string.Empty;
         }
 
-        private void BrowseCsvButton_Click(object sender, EventArgs e)
+        private void BrowseCsvButton_Click(object? sender, EventArgs e)
         {
-            using (var dialog = new OpenFileDialog())
+            using var openFileDialog = new OpenFileDialog
             {
-                dialog.Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*";
-                dialog.Title = "Select CSV file with replacement data";
-                if (dialog.ShowDialog() == DialogResult.OK)
-                {
-                    csvPathTextBox.Text = dialog.FileName;
-                }
+                Filter = "CSV Files (*.csv)|*.csv|All Files (*.*)|*.*",
+                Title = "Select CSV File"
+            };
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                csvPathTextBox.Text = openFileDialog.FileName;
             }
         }
 
-        private void BrowseTemplateButton_Click(object sender, EventArgs e)
+        private void BrowseTemplateButton_Click(object? sender, EventArgs e)
         {
-            using (var dialog = new OpenFileDialog())
+            using var openFileDialog = new OpenFileDialog
             {
-                dialog.Filter = templateTypeComboBox.SelectedItem.ToString() == "Excel"
-                    ? "Excel files (*.xlsx)|*.xlsx|All files (*.*)|*.*"
-                    : "Word files (*.docx)|*.docx|All files (*.*)|*.*";
-                dialog.Title = "Select template file";
-                if (dialog.ShowDialog() == DialogResult.OK)
-                {
-                    templatePathTextBox.Text = dialog.FileName;
-                }
+                Filter = templateTypeComboBox.SelectedItem?.ToString() == "Excel" 
+                    ? "Excel Files (*.xlsx)|*.xlsx|All Files (*.*)|*.*"
+                    : "Word Files (*.docx)|*.docx|All Files (*.*)|*.*",
+                Title = "Select Template File"
+            };
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                templatePathTextBox.Text = openFileDialog.FileName;
             }
         }
 
-        private void BrowseOutputButton_Click(object sender, EventArgs e)
+        private void BrowseOutputButton_Click(object? sender, EventArgs e)
         {
-            using (var dialog = new FolderBrowserDialog())
+            using var folderBrowserDialog = new FolderBrowserDialog
             {
-                dialog.Description = "Select directory for output files";
-                if (dialog.ShowDialog() == DialogResult.OK)
-                {
-                    outputDirTextBox.Text = dialog.SelectedPath;
-                }
+                Description = "Select Output Directory"
+            };
+
+            if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
+            {
+                outputDirTextBox.Text = folderBrowserDialog.SelectedPath;
             }
         }
 
-        private void ConfigureFileNameButton_Click(object sender, EventArgs e)
+        private void ConfigureFileNameButton_Click(object? sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(csvPathTextBox.Text))
+            using var configForm = new FileNameConfigForm(new List<string>(), fileNamePattern);
+            if (configForm.ShowDialog() == DialogResult.OK)
             {
-                MessageBox.Show("Please select a CSV file first to see available placeholders.",
-                              "No CSV File Selected",
-                              MessageBoxButtons.OK,
-                              MessageBoxIcon.Warning);
+                fileNamePattern = configForm.FileNamePattern;
+            }
+        }
+
+        private void PreviewButton_Click(object? sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(csvPathTextBox.Text) || string.IsNullOrEmpty(templatePathTextBox.Text))
+            {
+                MessageBox.Show("Please select both CSV and template files first.", "Missing Files", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -357,90 +657,49 @@ namespace ExcelReplacement
                 var records = _csvService.LoadCsvData(csvPathTextBox.Text);
                 if (records.Count == 0)
                 {
-                    MessageBox.Show("The selected CSV file contains no records.",
-                                  "Empty CSV File",
-                                  MessageBoxButtons.OK,
-                                  MessageBoxIcon.Warning);
+                    MessageBox.Show("No records found in the CSV file.", "Empty File", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
-                var placeholders = records[0].Values.Keys.ToList();
-                using (var configForm = new FileNameConfigForm(placeholders, fileNamePattern))
-                {
-                    if (configForm.ShowDialog() == DialogResult.OK)
-                    {
-                        fileNamePattern = configForm.FileNamePattern;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error loading CSV file: {ex.Message}",
-                              "Error",
-                              MessageBoxButtons.OK,
-                              MessageBoxIcon.Error);
-            }
-        }
-
-        private void PreviewButton_Click(object sender, EventArgs e)
-        {
-            if (string.IsNullOrEmpty(csvPathTextBox.Text) ||
-                string.IsNullOrEmpty(templatePathTextBox.Text))
-            {
-                MessageBox.Show("Please select both CSV and template files.", "Missing Information",
-                              MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            try
-            {
-                var previewForm = new Forms.PreviewForm();
-                previewForm.LoadPreview(
-                    templatePathTextBox.Text,
-                    csvPathTextBox.Text,
-                    templateTypeComboBox.SelectedItem.ToString() == "Excel"
-                );
+                using var previewForm = new PreviewForm();
+                previewForm.LoadPreview(templatePathTextBox.Text, csvPathTextBox.Text, templateTypeComboBox.SelectedItem?.ToString() == "Excel");
                 previewForm.ShowDialog();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error generating preview: {ex.Message}", "Error",
-                              MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Error previewing files: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private async void ProcessButton_Click(object sender, EventArgs e)
+        private async void ProcessButton_Click(object? sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(csvPathTextBox.Text) ||
-                string.IsNullOrEmpty(templatePathTextBox.Text) ||
-                string.IsNullOrEmpty(outputDirTextBox.Text))
+            if (string.IsNullOrEmpty(csvPathTextBox.Text) || string.IsNullOrEmpty(templatePathTextBox.Text) || string.IsNullOrEmpty(outputDirTextBox.Text))
             {
-                MessageBox.Show("Please select all required files and directories.", "Missing Information",
-                              MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Please select all required files and directories.", "Missing Files", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             try
             {
-                processButton.Enabled = false;
-                statusLabel.Text = "Processing...";
-
                 var records = _csvService.LoadCsvData(csvPathTextBox.Text);
+                if (records.Count == 0)
+                {
+                    MessageBox.Show("No records found in the CSV file.", "Empty File", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                processButton.Enabled = false;
                 progressForm = new ProgressForm();
                 progressForm.Show();
 
-                await System.Threading.Tasks.Task.Run(() =>
-                {
-                    ProcessFiles(records, templatePathTextBox.Text, outputDirTextBox.Text);
-                });
+                await Task.Run(() => ProcessFiles(records, templatePathTextBox.Text, outputDirTextBox.Text));
 
-                progressForm.ShowSummary($"Successfully processed {records.Count} records");
-                statusLabel.Text = "Complete!";
+                progressForm.Close();
+                MessageBox.Show("Processing completed successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                statusLabel.Text = "Error occurred";
+                MessageBox.Show($"Error processing files: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -451,7 +710,7 @@ namespace ExcelReplacement
         private void ProcessFiles(List<ExcelRecord> records, string templatePath, string outputDir)
         {
             EnsureOutputDirectoryExists(outputDir);
-            var isExcel = templateTypeComboBox.SelectedItem.ToString() == "Excel";
+            var isExcel = templateTypeComboBox.SelectedItem?.ToString() == "Excel";
             var extension = isExcel ? ".xlsx" : ".docx";
 
             for (int i = 0; i < records.Count; i++)
@@ -480,33 +739,13 @@ namespace ExcelReplacement
             }
         }
 
-        private void ManageTemplatesButton_Click(object sender, EventArgs e)
+        private void ManageTemplatesButton_Click(object? sender, EventArgs e)
         {
-            using (var manageForm = new Forms.ManageTemplatesForm())
+            using var manageTemplatesForm = new ManageTemplatesForm();
+            if (manageTemplatesForm.ShowDialog() == DialogResult.OK && manageTemplatesForm.SelectedTemplate != null)
             {
-                if (manageForm.ShowDialog() == DialogResult.OK && manageForm.SelectedTemplate != null)
-                {
-                    // Store the current template path for comparison
-                    string previousTemplatePath = templatePathTextBox.Text;
-
-                    // Update the template path
-                    templatePathTextBox.Text = manageForm.SelectedTemplate.Path;
-
-                    // Temporarily unsubscribe to prevent the handler from clearing the textbox
-                    templateTypeComboBox.SelectedIndexChanged -= TemplateTypeComboBox_SelectedIndexChanged;
-                    
-                    // Update template type combobox based on file extension
-                    UpdateTemplateTypeComboBox(manageForm.SelectedTemplate.Path);
-
-                    // Resubscribe the handler
-                    templateTypeComboBox.SelectedIndexChanged += TemplateTypeComboBox_SelectedIndexChanged;
-
-                    // Only show status message if the template actually changed
-                    if (previousTemplatePath != manageForm.SelectedTemplate.Path)
-                    {
-                        statusLabel.Text = $"Template loaded: {manageForm.SelectedTemplate.Name}";
-                    }
-                }
+                templatePathTextBox.Text = manageTemplatesForm.SelectedTemplate.Path;
+                UpdateTemplateTypeComboBox(manageTemplatesForm.SelectedTemplate.Path);
             }
         }
 
@@ -529,10 +768,10 @@ namespace ExcelReplacement
 
     public class ProgressForm : Form
     {
-        private Label statusLabel;
-        private ProgressBar progressBar;
-        private Label currentFileLabel;
-        private Button doneButton;
+        private Label statusLabel = new();
+        private ProgressBar progressBar = new();
+        private Label currentFileLabel = new();
+        private Button doneButton = new();
 
         public ProgressForm()
         {

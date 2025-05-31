@@ -20,11 +20,11 @@ namespace ExcelReplacement.Services
 
     public class ValidationResult
     {
-        public string Placeholder { get; set; }
+        public required string Placeholder { get; set; }
         public ValidationStatus Status { get; set; }
-        public string Message { get; set; }
-        public string SampleValue { get; set; }
-        public string Location { get; set; }
+        public required string Message { get; set; }
+        public required string SampleValue { get; set; }
+        public required string Location { get; set; }
     }
 
     public class TemplateValidator

@@ -9,16 +9,16 @@ namespace ExcelReplacement.Forms
 {
     public class FileNameConfigForm : Form
     {
-        private ListBox availablePlaceholdersListBox;
-        private TextBox patternTextBox;
-        private Button addPlaceholderButton;
-        private Button addTextButton;
-        private Button previewButton;
-        private Label previewLabel;
-        private Button saveButton;
-        private Button cancelButton;
+        private ListBox availablePlaceholdersListBox = new();
+        private TextBox patternTextBox = new();
+        private Button addPlaceholderButton = new();
+        private Button addTextButton = new();
+        private Button previewButton = new();
+        private Label previewLabel = new();
+        private Button saveButton = new();
+        private Button cancelButton = new();
         private List<string> availablePlaceholders;
-        private TextBox customTextTextBox;
+        private TextBox customTextTextBox = new();
 
         public string FileNamePattern { get; private set; }
 
@@ -27,6 +27,9 @@ namespace ExcelReplacement.Forms
             availablePlaceholders = placeholders;
             FileNamePattern = currentPattern;
             InitializeComponents();
+            
+            // Apply theme
+            ThemeManager.ApplyTheme(this);
         }
 
         private void InitializeComponents()
@@ -157,7 +160,7 @@ namespace ExcelReplacement.Forms
             });
         }
 
-        private void AddPlaceholderButton_Click(object sender, EventArgs e)
+        private void AddPlaceholderButton_Click(object? sender, EventArgs e)
         {
             if (availablePlaceholdersListBox.SelectedItem != null)
             {
@@ -166,7 +169,7 @@ namespace ExcelReplacement.Forms
             }
         }
 
-        private void AddTextButton_Click(object sender, EventArgs e)
+        private void AddTextButton_Click(object? sender, EventArgs e)
         {
             if (!string.IsNullOrWhiteSpace(customTextTextBox.Text))
             {
@@ -183,7 +186,7 @@ namespace ExcelReplacement.Forms
             patternTextBox.Focus();
         }
 
-        private void PreviewButton_Click(object sender, EventArgs e)
+        private void PreviewButton_Click(object? sender, EventArgs e)
         {
             try
             {
@@ -212,7 +215,7 @@ namespace ExcelReplacement.Forms
             return pattern + ".xlsx";
         }
 
-        private void SaveButton_Click(object sender, EventArgs e)
+        private void SaveButton_Click(object? sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(patternTextBox.Text))
             {
