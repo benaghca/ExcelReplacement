@@ -75,6 +75,7 @@ namespace ExcelReplacement.Forms
             {
                 new DataGridViewTextBoxColumn { Name = "Placeholder", HeaderText = "Placeholder" },
                 new DataGridViewTextBoxColumn { Name = "Status", HeaderText = "Status" },
+                new DataGridViewTextBoxColumn { Name = "Message", HeaderText = "Message" },
                 new DataGridViewTextBoxColumn { Name = "SampleValue", HeaderText = "Sample Value" },
                 new DataGridViewTextBoxColumn { Name = "Location", HeaderText = "Location" }
             });
@@ -91,7 +92,7 @@ namespace ExcelReplacement.Forms
         {
             try
             {
-                var csvService = new CsvService();
+                var csvService = new Services.CsvService();
                 var records = csvService.LoadCsvData(csvPath);
                 if (records.Count == 0)
                 {
@@ -99,29 +100,47 @@ namespace ExcelReplacement.Forms
                 }
 
                 var firstRecord = records[0];
-                var templateValidator = new TemplateValidator(templatePath, isExcel);
+                var templateValidator = new Services.TemplateValidator(templatePath, isExcel);
                 var validationResults = templateValidator.ValidateTemplate(firstRecord);
 
                 // Update validation grid
                 _placeholdersGrid.Rows.Clear();
                 foreach (var result in validationResults)
                 {
-                    _placeholdersGrid.Rows.Add(
+                    var row = _placeholdersGrid.Rows[_placeholdersGrid.Rows.Add(
                         result.Placeholder,
                         result.Status.ToString(),
+                        result.Message,
                         result.SampleValue,
                         result.Location
-                    );
+                    )];
+
+                    // Apply color based on status
+                    switch (result.Status)
+                    {
+                        case Services.ValidationStatus.Success:
+                            row.DefaultCellStyle.BackColor = Color.LightGreen;
+                            break;
+                        case Services.ValidationStatus.Warning:
+                            row.DefaultCellStyle.BackColor = Color.LightYellow;
+                            break;
+                        case Services.ValidationStatus.Error:
+                            row.DefaultCellStyle.BackColor = Color.Salmon;
+                            break;
+                        case Services.ValidationStatus.CsvColumnUnused:
+                            row.DefaultCellStyle.BackColor = Color.LightBlue;
+                            break;
+                    }
                 }
 
                 // Update preview
-                var previewService = new PreviewService();
+                var previewService = new Services.PreviewService();
                 var preview = previewService.GeneratePreview(templatePath, firstRecord, isExcel);
                 _previewTextBox.Text = preview;
 
                 // Update status
-                var errorCount = validationResults.Count(r => r.Status == ValidationStatus.Error);
-                var warningCount = validationResults.Count(r => r.Status == ValidationStatus.Warning);
+                var errorCount = validationResults.Count(r => r.Status.ToString() == "Error");
+                var warningCount = validationResults.Count(r => r.Status.ToString() == "Warning");
                 _statusLabel.Text = $"Found {errorCount} errors and {warningCount} warnings.";
                 _statusLabel.ForeColor = errorCount > 0 ? Color.Red : warningCount > 0 ? Color.Orange : Color.Green;
             }

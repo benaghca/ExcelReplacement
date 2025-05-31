@@ -61,6 +61,9 @@ namespace ExcelReplacement
         private Button previewButton;
         private string fileNamePattern = "[Location] [Facility] [Equipment] [Procedure]";
 
+        // Add the new Manage Templates button
+        private Button manageTemplatesButton;
+
         public MainForm()
         {
             InitializeComponents();
@@ -69,10 +72,31 @@ namespace ExcelReplacement
         private void InitializeComponents()
         {
             this.Text = "Document Template Processor";
-            this.Size = new Size(650, 450);
+            this.Size = new Size(700, 450); // Increased width slightly for better layout
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.StartPosition = FormStartPosition.CenterScreen;
             this.MaximizeBox = false;
+
+            // Create a TableLayoutPanel to manage the layout
+            var tableLayoutPanel = new TableLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                Padding = new Padding(10),
+                ColumnCount = 3,
+                RowCount = 6,
+                GrowStyle = TableLayoutPanelGrowStyle.AddRows
+            };
+
+            // Define column styles: Labels, TextBoxes, Buttons
+            tableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize)); // Column 0: Labels
+            tableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F)); // Column 1: TextBoxes (fills remaining space)
+            tableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize)); // Column 2: Buttons
+
+            // Define row styles (auto-sized for each row of controls)
+            for (int i = 0; i < tableLayoutPanel.RowCount; i++)
+            {
+                tableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            }
 
             // Template Type Selection
             var templateTypeLabel = new Label
@@ -179,6 +203,15 @@ namespace ExcelReplacement
             };
             previewButton.Click += PreviewButton_Click;
 
+            // New Manage Templates Button
+            manageTemplatesButton = new Button
+            {
+                Text = "Manage Templates",
+                Location = new Point(370, 200), // Adjusted location
+                Size = new Size(120, 30)
+            };
+            manageTemplatesButton.Click += ManageTemplatesButton_Click;
+
             // Process Button
             processButton = new Button
             {
@@ -196,24 +229,62 @@ namespace ExcelReplacement
                 AutoSize = true
             };
 
-            // Add controls to form
-            this.Controls.AddRange(new System.Windows.Forms.Control[] {
-                templateTypeLabel,
-                templateTypeComboBox,
-                csvLabel,
-                csvPathTextBox,
-                browseCsvButton,
-                templateLabel,
-                templatePathTextBox,
-                browseTemplateButton,
-                outputLabel,
-                outputDirTextBox,
-                browseOutputButton,
-                configureFileNameButton,
-                previewButton,
-                processButton,
-                statusLabel
-            });
+            // Add controls to the TableLayoutPanel
+            tableLayoutPanel.Controls.Add(templateTypeLabel, 0, 0);
+            tableLayoutPanel.Controls.Add(templateTypeComboBox, 1, 0);
+            // Skip column 2 in row 0 for template type
+
+            tableLayoutPanel.Controls.Add(csvLabel, 0, 1);
+            tableLayoutPanel.Controls.Add(csvPathTextBox, 1, 1);
+            tableLayoutPanel.Controls.Add(browseCsvButton, 2, 1);
+
+            tableLayoutPanel.Controls.Add(templateLabel, 0, 2);
+            tableLayoutPanel.Controls.Add(templatePathTextBox, 1, 2);
+            tableLayoutPanel.Controls.Add(browseTemplateButton, 2, 2);
+
+            tableLayoutPanel.Controls.Add(outputLabel, 0, 3);
+            tableLayoutPanel.Controls.Add(outputDirTextBox, 1, 3);
+            tableLayoutPanel.Controls.Add(browseOutputButton, 2, 3);
+
+            // Buttons row (spanning columns for better centering/grouping if needed, or individual cells)
+            // Let's place them in a FlowLayoutPanel within a TableLayoutPanel cell for flexibility
+            var buttonFlowPanel = new FlowLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                FlowDirection = FlowDirection.LeftToRight,
+                WrapContents = false,
+                AutoSize = true
+            };
+
+            buttonFlowPanel.Controls.Add(configureFileNameButton);
+            buttonFlowPanel.Controls.Add(previewButton);
+            buttonFlowPanel.Controls.Add(manageTemplatesButton);
+
+            tableLayoutPanel.Controls.Add(buttonFlowPanel, 0, 4); // Span across all 3 columns
+            tableLayoutPanel.SetColumnSpan(buttonFlowPanel, 3);
+
+            // Process Files button centered below the others
+             var processButtonFlowPanel = new FlowLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                FlowDirection = FlowDirection.TopDown, // Stack vertically within this panel
+                WrapContents = false,
+                AutoSize = true,
+                Anchor = AnchorStyles.None // Center the flow panel in the cell
+            };
+            processButtonFlowPanel.Controls.Add(processButton);
+             tableLayoutPanel.Controls.Add(processButtonFlowPanel, 0, 5); // Span across all 3 columns
+            tableLayoutPanel.SetColumnSpan(processButtonFlowPanel, 3);
+
+
+            // Status Label (spanning columns)
+            tableLayoutPanel.Controls.Add(statusLabel, 0, 6); // Row 6
+            tableLayoutPanel.SetColumnSpan(statusLabel, 3);
+            statusLabel.Anchor = AnchorStyles.Left | AnchorStyles.Right; // Stretch across cell
+
+
+            // Add the TableLayoutPanel to the form's controls
+            this.Controls.Add(tableLayoutPanel);
         }
 
         private void TemplateTypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -323,7 +394,7 @@ namespace ExcelReplacement
 
             try
             {
-                var previewForm = new PreviewForm();
+                var previewForm = new Forms.PreviewForm();
                 previewForm.LoadPreview(
                     templatePathTextBox.Text,
                     csvPathTextBox.Text,
@@ -406,6 +477,52 @@ namespace ExcelReplacement
             if (!Directory.Exists(outputDir))
             {
                 Directory.CreateDirectory(outputDir);
+            }
+        }
+
+        private void ManageTemplatesButton_Click(object sender, EventArgs e)
+        {
+            using (var manageForm = new Forms.ManageTemplatesForm())
+            {
+                if (manageForm.ShowDialog() == DialogResult.OK && manageForm.SelectedTemplate != null)
+                {
+                    // Store the current template path for comparison
+                    string previousTemplatePath = templatePathTextBox.Text;
+
+                    // Update the template path
+                    templatePathTextBox.Text = manageForm.SelectedTemplate.Path;
+
+                    // Temporarily unsubscribe to prevent the handler from clearing the textbox
+                    templateTypeComboBox.SelectedIndexChanged -= TemplateTypeComboBox_SelectedIndexChanged;
+                    
+                    // Update template type combobox based on file extension
+                    UpdateTemplateTypeComboBox(manageForm.SelectedTemplate.Path);
+
+                    // Resubscribe the handler
+                    templateTypeComboBox.SelectedIndexChanged += TemplateTypeComboBox_SelectedIndexChanged;
+
+                    // Only show status message if the template actually changed
+                    if (previousTemplatePath != manageForm.SelectedTemplate.Path)
+                    {
+                        statusLabel.Text = $"Template loaded: {manageForm.SelectedTemplate.Name}";
+                    }
+                }
+            }
+        }
+
+        private void UpdateTemplateTypeComboBox(string filePath)
+        {
+            if (!string.IsNullOrEmpty(filePath))
+            {
+                string extension = Path.GetExtension(filePath).ToLower();
+                if (extension == ".xlsx")
+                {
+                    templateTypeComboBox.SelectedItem = "Excel";
+                }
+                else if (extension == ".docx")
+                {
+                    templateTypeComboBox.SelectedItem = "Word";
+                }
             }
         }
     }
