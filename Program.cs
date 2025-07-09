@@ -220,6 +220,25 @@ namespace ExcelReplacement
             this.StartPosition = FormStartPosition.CenterScreen;
             this.MaximizeBox = false;
 
+            // Simple menu with About dialog
+            var menuStrip = new MenuStrip();
+            var fileMenu = new ToolStripMenuItem("&File");
+            var exitMenuItem = new ToolStripMenuItem("E&xit");
+            exitMenuItem.Click += (s, e) => this.Close();
+            fileMenu.DropDownItems.Add(exitMenuItem);
+
+            var helpMenu = new ToolStripMenuItem("&Help");
+            var aboutMenuItem = new ToolStripMenuItem("&About");
+            aboutMenuItem.Click += AboutMenuItem_Click;
+            helpMenu.DropDownItems.Add(aboutMenuItem);
+
+            menuStrip.Items.Add(fileMenu);
+            menuStrip.Items.Add(helpMenu);
+            this.MainMenuStrip = menuStrip;
+            this.Controls.Add(menuStrip);
+
+            var toolTip = new ToolTip();
+
             // Create a TableLayoutPanel to manage the layout
             var tableLayoutPanel = new TableLayoutPanel
             {
@@ -281,6 +300,7 @@ namespace ExcelReplacement
                 Width = 70
             };
             browseCsvButton.Click += BrowseCsvButton_Click;
+            toolTip.SetToolTip(browseCsvButton, "Select the CSV file with replacement data");
 
             // Template File Selection
             var templateLabel = new Label
@@ -304,6 +324,7 @@ namespace ExcelReplacement
                 Width = 70
             };
             browseTemplateButton.Click += BrowseTemplateButton_Click;
+            toolTip.SetToolTip(browseTemplateButton, "Select the template file");
 
             // Output Directory Selection
             var outputLabel = new Label
@@ -327,6 +348,7 @@ namespace ExcelReplacement
                 Width = 70
             };
             browseOutputButton.Click += BrowseOutputButton_Click;
+            toolTip.SetToolTip(browseOutputButton, "Choose where processed files will be saved");
 
             // Configure File Name Button
             configureFileNameButton = new Button
@@ -336,6 +358,7 @@ namespace ExcelReplacement
                 Size = new Size(200, 30)
             };
             configureFileNameButton.Click += ConfigureFileNameButton_Click;
+            toolTip.SetToolTip(configureFileNameButton, "Set how output files should be named");
 
             // Preview Button
             previewButton = new Button
@@ -345,6 +368,7 @@ namespace ExcelReplacement
                 Size = new Size(120, 30)
             };
             previewButton.Click += PreviewButton_Click;
+            toolTip.SetToolTip(previewButton, "Validate the template with sample data");
 
             // New Manage Templates Button
             manageTemplatesButton = new Button
@@ -354,6 +378,7 @@ namespace ExcelReplacement
                 Size = new Size(120, 30)
             };
             manageTemplatesButton.Click += ManageTemplatesButton_Click;
+            toolTip.SetToolTip(manageTemplatesButton, "Add or remove saved templates");
 
             // Process Button
             processButton = new Button
@@ -363,6 +388,7 @@ namespace ExcelReplacement
                 Size = new Size(100, 30)
             };
             processButton.Click += ProcessButton_Click;
+            toolTip.SetToolTip(processButton, "Generate documents for all records");
 
             // Status Label
             statusLabel = new Label
@@ -601,6 +627,12 @@ namespace ExcelReplacement
             }
         }
 
+        private void AboutMenuItem_Click(object? sender, EventArgs e)
+        {
+            using var about = new AboutForm();
+            about.ShowDialog(this);
+        }
+
         private void UpdateTemplateTypeComboBox(string filePath)
         {
             if (!string.IsNullOrEmpty(filePath))
@@ -684,7 +716,7 @@ namespace ExcelReplacement
 
             progressBar.Maximum = total;
             progressBar.Value = current;
-            currentFileLabel.Text = $"Processing: {currentFile}";
+            currentFileLabel.Text = $"Processing {current} of {total}: {currentFile}";
         }
 
         public void ShowSummary(string message)
@@ -700,5 +732,4 @@ namespace ExcelReplacement
             progressBar.Value = progressBar.Maximum;
             doneButton.Visible = true;
         }
-    }
-}
+    }}
