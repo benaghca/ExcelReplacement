@@ -20,15 +20,15 @@ namespace ExcelReplacement
 {
     public static class ThemeManager
     {
-        // Classic terminal colors with improved readability
-        public static System.Drawing.Color BackgroundColor = System.Drawing.Color.FromArgb(0, 0, 0); // Pure black background
-        public static System.Drawing.Color ForegroundColor = System.Drawing.Color.FromArgb(0, 255, 128); // Brighter green for better readability
-        public static System.Drawing.Color AccentColor = System.Drawing.Color.FromArgb(0, 255, 192); // Even brighter green for accents
-        public static System.Drawing.Color ControlBackgroundColor = System.Drawing.Color.FromArgb(0, 0, 0); // Keep controls black
-        public static System.Drawing.Color BorderColor = System.Drawing.Color.FromArgb(0, 192, 0); // Brighter green for borders
-        public static System.Drawing.Color GridBackgroundColor = System.Drawing.Color.FromArgb(0, 0, 0); // Black grid background
-        public static System.Drawing.Color GridHeaderColor = System.Drawing.Color.FromArgb(0, 96, 0); // Darker green for headers
-        public static System.Drawing.Color SelectionColor = System.Drawing.Color.FromArgb(0, 192, 0); // Brighter green for selection
+        // Neutral colors for a standard Windows look
+        public static System.Drawing.Color BackgroundColor = System.Drawing.SystemColors.Window;
+        public static System.Drawing.Color ForegroundColor = System.Drawing.SystemColors.ControlText;
+        public static System.Drawing.Color AccentColor = System.Drawing.SystemColors.Highlight;
+        public static System.Drawing.Color ControlBackgroundColor = System.Drawing.SystemColors.Window;
+        public static System.Drawing.Color BorderColor = System.Drawing.SystemColors.ControlDark;
+        public static System.Drawing.Color GridBackgroundColor = System.Drawing.SystemColors.Window;
+        public static System.Drawing.Color GridHeaderColor = System.Drawing.SystemColors.Control;
+        public static System.Drawing.Color SelectionColor = System.Drawing.SystemColors.Highlight;
 
         // Status colors in terminal style with improved contrast
         public static System.Drawing.Color SuccessColor = System.Drawing.Color.FromArgb(0, 255, 128); // Bright green
@@ -37,8 +37,8 @@ namespace ExcelReplacement
         public static System.Drawing.Color InfoColor = System.Drawing.Color.FromArgb(64, 192, 255); // Softer blue for info
 
         // Hover and active states with better visibility
-        public static System.Drawing.Color HoverColor = System.Drawing.Color.FromArgb(0, 96, 0); // Dark green
-        public static System.Drawing.Color ActiveColor = System.Drawing.Color.FromArgb(0, 128, 0); // Medium green
+        public static System.Drawing.Color HoverColor = System.Drawing.SystemColors.ControlLight;
+        public static System.Drawing.Color ActiveColor = System.Drawing.SystemColors.Highlight;
 
         public static void ApplyTheme(System.Windows.Forms.Form form)
         {
@@ -55,141 +55,40 @@ namespace ExcelReplacement
         {
             if (control is System.Windows.Forms.Button button)
             {
-                button.BackColor = ControlBackgroundColor;
-                button.ForeColor = ForegroundColor;
-                button.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-                button.FlatAppearance.BorderColor = BorderColor;
-                button.FlatAppearance.MouseOverBackColor = HoverColor;
-                button.FlatAppearance.MouseDownBackColor = ActiveColor;
-                button.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+                button.UseVisualStyleBackColor = true;
+                button.Font = System.Drawing.SystemFonts.MessageBoxFont;
             }
             else if (control is System.Windows.Forms.TextBox textBox)
             {
-                textBox.BackColor = ControlBackgroundColor;
-                textBox.ForeColor = ForegroundColor;
-                textBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-                textBox.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+                textBox.Font = System.Drawing.SystemFonts.MessageBoxFont;
             }
             else if (control is System.Windows.Forms.ComboBox comboBox)
             {
-                comboBox.BackColor = ControlBackgroundColor;
-                comboBox.ForeColor = ForegroundColor;
-                comboBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-                comboBox.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+                comboBox.Font = System.Drawing.SystemFonts.MessageBoxFont;
             }
             else if (control is System.Windows.Forms.DataGridView grid)
             {
-                grid.BackgroundColor = GridBackgroundColor;
-                grid.ForeColor = ForegroundColor;
-                grid.BorderStyle = System.Windows.Forms.BorderStyle.None;
-                grid.ColumnHeadersDefaultCellStyle.BackColor = GridHeaderColor;
-                grid.ColumnHeadersDefaultCellStyle.ForeColor = ForegroundColor;
-                grid.ColumnHeadersDefaultCellStyle.SelectionBackColor = ActiveColor;
-                grid.ColumnHeadersDefaultCellStyle.SelectionForeColor = ForegroundColor;
-                grid.DefaultCellStyle.BackColor = GridBackgroundColor;
-                grid.DefaultCellStyle.ForeColor = ForegroundColor;
-                grid.DefaultCellStyle.SelectionBackColor = GridBackgroundColor;
-                grid.DefaultCellStyle.SelectionForeColor = ForegroundColor;
-                grid.DefaultCellStyle.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-                grid.ColumnHeadersDefaultCellStyle.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-                grid.EnableHeadersVisualStyles = false;
-                
-                grid.CellBorderStyle = DataGridViewCellBorderStyle.Single;
-                grid.DefaultCellStyle.SelectionBackColor = GridBackgroundColor;
-                grid.DefaultCellStyle.SelectionForeColor = ForegroundColor;
-                
-                grid.CellPainting += (sender, e) =>
-                {
-                    // Paint row header
-                    if (e.RowIndex >= 0 && e.ColumnIndex == -1)
-                    {
-                        // Manually paint the background with the desired color
-                        using (var brush = new System.Drawing.SolidBrush(GridBackgroundColor))
-                        {
-                            e.Graphics.FillRectangle(brush, e.CellBounds);
-                        }
-
-                        // Draw the triangle/arrow for the selected row header
-                        if (grid.Rows[e.RowIndex].Selected)
-                        {
-                            int triangleSize = 6;
-                            int x = e.CellBounds.Left + (e.CellBounds.Width - triangleSize) / 2;
-                            int y = e.CellBounds.Top + (e.CellBounds.Height - triangleSize) / 2;
-                            Point[] trianglePoints = new Point[]
-                            {
-                                new Point(x, y),
-                                new Point(x + triangleSize, y + triangleSize / 2),
-                                new Point(x, y + triangleSize)
-                            };
-                            using (var brush = new System.Drawing.SolidBrush(SelectionColor))
-                            {
-                                e.Graphics.FillPolygon(brush, trianglePoints);
-                            }
-                        }
-
-                        // Optionally draw row number if RowHeadersVisible is true
-                        // if (grid.RowHeadersVisible)
-                        // {
-                        //     using (var sf = new StringFormat() { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
-                        //     using (var brush = new SolidBrush(ForegroundColor))
-                        //     {
-                        //         e.Graphics.DrawString((e.RowIndex + 1).ToString(), e.CellStyle.Font, brush, e.CellBounds, sf);
-                        //     }
-                        // }
-
-                        // Draw border for selected row header
-                         if (grid.Rows[e.RowIndex].Selected)
-                         {
-                            using (var pen = new System.Drawing.Pen(SelectionColor, 2))
-                            {
-                                e.Graphics.DrawRectangle(pen, new System.Drawing.Rectangle(
-                                    e.CellBounds.X,
-                                    e.CellBounds.Y,
-                                    e.CellBounds.Width - 1,
-                                    e.CellBounds.Height - 1));
-                            }
-                         }
-
-                        e.Handled = true;
-                    }
-                    // Paint data cells
-                    else if (e.RowIndex >= 0 && e.ColumnIndex >= 0)
-                    {
-                        var cell = grid.Rows[e.RowIndex].Cells[e.ColumnIndex];
-                        if (cell.Selected)
-                        {
-                            e.Paint(e.CellBounds, DataGridViewPaintParts.All);
-                            using (var pen = new System.Drawing.Pen(SelectionColor, 2))
-                            {
-                                e.Graphics.DrawRectangle(pen, new System.Drawing.Rectangle(
-                                    e.CellBounds.X,
-                                    e.CellBounds.Y,
-                                    e.CellBounds.Width - 1,
-                                    e.CellBounds.Height - 1));
-                            }
-                            e.Handled = true;
-                        }
-                    }
-                };
+                grid.DefaultCellStyle.Font = System.Drawing.SystemFonts.MessageBoxFont;
+                grid.ColumnHeadersDefaultCellStyle.Font = System.Drawing.SystemFonts.MessageBoxFont;
             }
             else if (control is System.Windows.Forms.ListView listView)
             {
                 listView.BackColor = ControlBackgroundColor;
                 listView.ForeColor = ForegroundColor;
                 listView.BorderStyle = System.Windows.Forms.BorderStyle.None;
-                listView.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+                listView.Font = System.Drawing.SystemFonts.MessageBoxFont;
             }
             else if (control is System.Windows.Forms.RichTextBox richTextBox)
             {
                 richTextBox.BackColor = ControlBackgroundColor;
                 richTextBox.ForeColor = ForegroundColor;
                 richTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
-                richTextBox.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+                richTextBox.Font = System.Drawing.SystemFonts.MessageBoxFont;
             }
             else if (control is System.Windows.Forms.Label label)
             {
                 label.ForeColor = ForegroundColor;
-                label.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+                label.Font = System.Drawing.SystemFonts.MessageBoxFont;
             }
             else if (control is System.Windows.Forms.ProgressBar progressBar)
             {
@@ -200,60 +99,13 @@ namespace ExcelReplacement
             {
                 tabControl.BackColor = BackgroundColor;
                 tabControl.ForeColor = ForegroundColor;
-                tabControl.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-                
-                // Custom drawing for TabControl tabs
-                tabControl.DrawMode = TabDrawMode.OwnerDrawFixed;
-                tabControl.Padding = new Point(6, 4);
-                tabControl.ItemSize = new Size(tabControl.ItemSize.Width, 20);
-                tabControl.Appearance = TabAppearance.FlatButtons;
-                tabControl.Region = new Region(new RectangleF(0, 0, tabControl.Width, tabControl.Height));
-
-                tabControl.DrawItem += (sender, e) =>
-                {
-                    var tabControl = (System.Windows.Forms.TabControl)sender;
-                    var tabPage = tabControl.TabPages[e.Index];
-                    var tabBounds = e.Bounds;
-
-                    // Determine colors based on selection state and theme
-                    var backColor = tabControl.SelectedIndex == e.Index ? ActiveColor : BackgroundColor;
-                    var foreColor = ForegroundColor;
-
-                    // Draw background
-                    using (var brush = new System.Drawing.SolidBrush(backColor))
-                    {
-                        e.Graphics.FillRectangle(brush, tabBounds);
-                    }
-
-                    // Draw tab text
-                    System.Windows.Forms.TextRenderer.DrawText(
-                        e.Graphics,
-                        tabPage.Text,
-                        tabControl.Font,
-                        tabBounds,
-                        foreColor,
-                        TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter
-                    );
-
-                    // Draw border for selected tab
-                    if (tabControl.SelectedIndex == e.Index)
-                    {
-                        using (var pen = new System.Drawing.Pen(SelectionColor, 2))
-                        {
-                            e.Graphics.DrawRectangle(pen, new System.Drawing.Rectangle(
-                                tabBounds.X,
-                                tabBounds.Y,
-                                tabBounds.Width - 1,
-                                tabBounds.Height - 1));
-                        }
-                    }
-                };
+                tabControl.Font = System.Drawing.SystemFonts.MessageBoxFont;
 
                 foreach (System.Windows.Forms.TabPage page in tabControl.TabPages)
                 {
                     page.BackColor = BackgroundColor;
                     page.ForeColor = ForegroundColor;
-                    page.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+                    page.Font = System.Drawing.SystemFonts.MessageBoxFont;
                 }
             }
             else if (control is System.Windows.Forms.SplitContainer splitContainer)
