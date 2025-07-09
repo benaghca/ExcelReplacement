@@ -63,7 +63,7 @@ You can distribute the application as a standalone executable that doesn't requi
    ```
 
 2. **Locate the executable**:
-   - The executable will be in the `bin\Release\net6.0-windows\win-x64\publish` directory
+   - The executable will be in the `bin\Release\net8.0-windows\win-x64\publish` directory
    - The file will be named `ExcelReplacement.exe`
 
 3. **Distribute to users**:
