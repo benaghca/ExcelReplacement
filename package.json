@@ -48,26 +48,32 @@
   },
   "build": {
     "appId": "com.excelreplacement.app",
+    "productName": "Excel Replacement",
+    "directories": {
+      "output": "build"
+    },
+    "files": [
+      "main.js",
+      "index.html",
+      "app.js",
+      "styles.css",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "bin/Release/net8.0/win-x64/publish/",
+        "to": "bin/Release/net8.0/win-x64/publish/",
+        "filter": ["**/*"]
+      }
+    ],
     "win": {
-      "target": "nsis",
-      "publish": [
-        "github"
+      "target": [
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
       ]
     },
-    "mac": {
-      "target": "dmg",
-      "publish": [
-        "github"
-      ]
-    },
-    "linux": {
-      "target": "AppImage",
-      "publish": [
-        "github"
-      ]
-    },
-    "publish": {
-      "provider": "github"
-    }
+    "forceCodeSigning": false
   }
 }
