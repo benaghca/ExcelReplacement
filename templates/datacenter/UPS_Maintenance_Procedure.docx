@@ -1,0 +1,97 @@
+# UPS System Maintenance Procedure
+
+## Equipment Information
+- **UPS ID**: [UPS_ID]
+- **Location**: Building [BUILDING], Floor [FLOOR], Room [ROOM]
+- **Model**: [MODEL_NUMBER]
+- **Serial Number**: [SERIAL_NUMBER]
+- **Manufacturer**: [MANUFACTURER]
+- **Installation Date**: [INSTALLATION_DATE]
+- **Battery Date**: [BATTERY_DATE]
+
+## Electrical Specifications
+- **Input Voltage**: [INPUT_VOLTAGE] VAC
+- **Output Voltage**: [OUTPUT_VOLTAGE] VAC
+- **Power Rating**: [POWER_RATING] kVA
+- **Battery Capacity**: [BATTERY_CAPACITY] Ah
+- **Runtime**: [RUNTIME] minutes at full load
+
+## Pre-Maintenance Checklist
+- [ ] Notify IT department of maintenance window
+- [ ] Verify backup power is available
+- [ ] Check for any active alarms
+- [ ] Ensure proper PPE is available
+- [ ] Review previous maintenance records
+- [ ] Verify work area is clear
+
+## Maintenance Procedure
+
+### 1. Visual Inspection
+- Check for physical damage
+- Verify all connections are tight
+- Check for signs of overheating
+- Inspect battery terminals for corrosion
+- Verify ventilation is adequate
+
+### 2. Electrical Testing
+- **Input Voltage**: [INPUT_VOLTAGE] VAC ±5%
+- **Output Voltage**: [OUTPUT_VOLTAGE] VAC ±2%
+- **Frequency**: [FREQUENCY] Hz ±0.5%
+- **Load Current**: [LOAD_CURRENT] A
+- **Power Factor**: [POWER_FACTOR]
+
+### 3. Battery Testing
+- **Battery Voltage**: [BATTERY_VOLTAGE] VDC
+- **Individual Cell Voltage**: [CELL_VOLTAGE] VDC
+- **Battery Temperature**: [BATTERY_TEMP]°F
+- **Load Test**: [LOAD_TEST] minutes
+- **End Voltage**: [END_VOLTAGE] VDC
+
+### 4. Transfer Testing
+- **Normal to Bypass**: [NORMAL_TO_BYPASS] ms
+- **Bypass to Normal**: [BYPASS_TO_NORMAL] ms
+- **Normal to Battery**: [NORMAL_TO_BATTERY] ms
+- **Battery to Normal**: [BATTERY_TO_NORMAL] ms
+
+### 5. Alarm Testing
+- **Low Battery**: [LOW_BATTERY_ALARM]
+- **Overload**: [OVERLOAD_ALARM]
+- **High Temperature**: [HIGH_TEMP_ALARM]
+- **Communication**: [COMM_ALARM]
+
+## Maintenance Schedule
+- **Daily**: Visual inspection, alarm check
+- **Weekly**: Load testing, temperature check
+- **Monthly**: Battery voltage check, cleaning
+- **Quarterly**: Full load test, calibration
+- **Annually**: Complete system overhaul, battery replacement
+
+## Safety Requirements
+- **PPE Required**: Safety glasses, work gloves, hard hat, arc flash suit
+- **Lockout/Tagout**: Required for all electrical work
+- **Confined Space**: May apply for battery room
+- **Hot Work**: Not applicable
+
+## Emergency Procedures
+- **Fire**: Activate fire suppression, evacuate area
+- **Electrical Fault**: Open main disconnect, contact electrician
+- **Battery Leak**: Isolate area, contact hazmat team
+- **System Failure**: Switch to bypass, contact technician
+
+## Parts and Supplies
+- **Batteries**: [BATTERY_PART_NUMBER]
+- **Filters**: [FILTER_PART_NUMBER]
+- **Fuses**: [FUSE_PART_NUMBER]
+- **Contactors**: [CONTACTOR_PART_NUMBER]
+
+## Contact Information
+- **Facility Manager**: [FACILITY_MANAGER]
+- **Electrical Lead**: [ELECTRICAL_LEAD]
+- **Emergency Contact**: [EMERGENCY_CONTACT]
+- **Vendor Support**: [VENDOR_SUPPORT]
+
+## Document Control
+- **Procedure Version**: [PROCEDURE_VERSION]
+- **Last Updated**: [LAST_UPDATED]
+- **Next Review**: [NEXT_REVIEW]
+- **Approved By**: [APPROVED_BY]

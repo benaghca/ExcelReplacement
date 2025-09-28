@@ -1,0 +1,103 @@
+# CRAH Unit Operation Procedure
+
+## Equipment Information
+- **Unit ID**: [UNIT_ID]
+- **Location**: Building [BUILDING], Floor [FLOOR], Row [ROW]
+- **Model**: [MODEL_NUMBER]
+- **Serial Number**: [SERIAL_NUMBER]
+- **Manufacturer**: [MANUFACTURER]
+- **Installation Date**: [INSTALLATION_DATE]
+
+## Electrical Specifications
+- **Power Supply**: [POWER_SUPPLY] VAC, [AMPERAGE] A
+- **Circuit Number**: [CIRCUIT_NUMBER]
+- **Breaker Rating**: [BREAKER_RATING] A
+- **UPS Connection**: [UPS_CONNECTION]
+
+## Mechanical Specifications
+- **Cooling Capacity**: [COOLING_CAPACITY] tons
+- **Airflow**: [AIRFLOW] CFM
+- **Water Flow**: [WATER_FLOW] GPM
+- **Operating Pressure**: [OPERATING_PRESSURE] PSI
+
+## Pre-Operation Checklist
+- [ ] Verify power supply is available
+- [ ] Check water supply valves are open
+- [ ] Ensure drain lines are clear
+- [ ] Verify control panel is accessible
+- [ ] Check for any visible damage
+- [ ] Ensure area is clear of obstructions
+
+## Startup Procedure
+1. **Power On**
+   - Close main electrical disconnect
+   - Verify control panel displays normal
+   - Check for any fault indicators
+
+2. **Water System**
+   - Open supply water valve
+   - Open return water valve
+   - Check for leaks
+   - Verify water pressure is [WATER_PRESSURE] PSI
+
+3. **Control System**
+   - Set temperature to [SETPOINT_TEMPERATURE]°F
+   - Set fan speed to [FAN_SPEED]%
+   - Enable automatic mode
+   - Verify all sensors are reading
+
+4. **Final Verification**
+   - Check air temperature differential
+   - Verify water temperature differential
+   - Ensure no unusual noises
+   - Confirm all alarms are clear
+
+## Normal Operation
+- **Temperature Range**: [MIN_TEMP]°F to [MAX_TEMP]°F
+- **Pressure Range**: [MIN_PRESSURE] to [MAX_PRESSURE] PSI
+- **Fan Speed Range**: [MIN_FAN]% to [MAX_FAN]%
+- **Operating Hours**: [OPERATING_HOURS]
+
+## Shutdown Procedure
+1. **Gradual Shutdown**
+   - Reduce fan speed to minimum
+   - Allow unit to reach ambient temperature
+   - Close water supply valve
+   - Close water return valve
+
+2. **Power Off**
+   - Switch to manual mode
+   - Turn off fan
+   - Open main electrical disconnect
+   - Verify all systems are off
+
+## Maintenance Schedule
+- **Daily**: Visual inspection, temperature checks
+- **Weekly**: Filter inspection, water level check
+- **Monthly**: Belt inspection, electrical connections
+- **Quarterly**: Water treatment, sensor calibration
+- **Annually**: Complete system inspection, parts replacement
+
+## Safety Requirements
+- **PPE Required**: Safety glasses, work gloves, hard hat
+- **Lockout/Tagout**: Required for electrical work
+- **Confined Space**: Not applicable
+- **Hot Work**: Not applicable
+
+## Emergency Procedures
+- **Fire**: Activate fire suppression, evacuate area
+- **Electrical Fault**: Open main disconnect, contact electrician
+- **Water Leak**: Close water valves, contact maintenance
+- **Equipment Failure**: Switch to backup unit, contact technician
+
+## Contact Information
+- **Facility Manager**: [FACILITY_MANAGER]
+- **Maintenance Lead**: [MAINTENANCE_LEAD]
+- **Emergency Contact**: [EMERGENCY_CONTACT]
+- **Vendor Support**: [VENDOR_SUPPORT]
+
+## Document Control
+- **Procedure Version**: [PROCEDURE_VERSION]
+- **Last Updated**: [LAST_UPDATED]
+- **Next Review**: [NEXT_REVIEW]
+- **Approved By**: [APPROVED_BY]

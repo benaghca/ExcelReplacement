@@ -1,0 +1,261 @@
+{
+  "datacenter": {
+    "name": "Data Center Operations Template",
+    "version": "1.0.0",
+    "description": "Specialized templates for data center facility operations",
+    "targetMarkets": [
+      "Data Center Operators",
+      "Construction Companies", 
+      "Facility Management",
+      "Equipment Manufacturers"
+    ]
+  },
+  "equipmentTypes": {
+    "CRAH": {
+      "name": "Computer Room Air Handler",
+      "description": "Cooling units for data center environments",
+      "commonSpecs": [
+        "UNIT_ID",
+        "MODEL_NUMBER", 
+        "SERIAL_NUMBER",
+        "MANUFACTURER",
+        "COOLING_CAPACITY",
+        "AIRFLOW",
+        "WATER_FLOW",
+        "POWER_SUPPLY",
+        "CIRCUIT_NUMBER"
+      ],
+      "templates": [
+        "Operation_Procedure",
+        "Maintenance_Procedure", 
+        "Emergency_Procedure",
+        "Installation_Procedure"
+      ]
+    },
+    "CRAC": {
+      "name": "Computer Room Air Conditioner",
+      "description": "Direct expansion cooling units",
+      "commonSpecs": [
+        "UNIT_ID",
+        "MODEL_NUMBER",
+        "SERIAL_NUMBER", 
+        "MANUFACTURER",
+        "COOLING_CAPACITY",
+        "AIRFLOW",
+        "REFRIGERANT_TYPE",
+        "POWER_SUPPLY",
+        "CIRCUIT_NUMBER"
+      ],
+      "templates": [
+        "Operation_Procedure",
+        "Maintenance_Procedure",
+        "Emergency_Procedure",
+        "Installation_Procedure"
+      ]
+    },
+    "UPS": {
+      "name": "Uninterruptible Power Supply",
+      "description": "Backup power systems",
+      "commonSpecs": [
+        "UPS_ID",
+        "MODEL_NUMBER",
+        "SERIAL_NUMBER",
+        "MANUFACTURER", 
+        "POWER_RATING",
+        "BATTERY_CAPACITY",
+        "RUNTIME",
+        "INPUT_VOLTAGE",
+        "OUTPUT_VOLTAGE"
+      ],
+      "templates": [
+        "Maintenance_Procedure",
+        "Battery_Test_Procedure",
+        "Emergency_Procedure",
+        "Installation_Procedure"
+      ]
+    },
+    "PDU": {
+      "name": "Power Distribution Unit",
+      "description": "Electrical distribution equipment",
+      "commonSpecs": [
+        "PDU_ID",
+        "MODEL_NUMBER",
+        "SERIAL_NUMBER",
+        "MANUFACTURER",
+        "POWER_RATING",
+        "OUTLET_COUNT",
+        "INPUT_VOLTAGE",
+        "OUTPUT_VOLTAGE",
+        "CIRCUIT_NUMBER"
+      ],
+      "templates": [
+        "Operation_Procedure",
+        "Maintenance_Procedure",
+        "Emergency_Procedure",
+        "Installation_Procedure"
+      ]
+    }
+  },
+  "placeholders": {
+    "location": [
+      "BUILDING",
+      "FLOOR", 
+      "ROW",
+      "ROOM",
+      "RACK_POSITION"
+    ],
+    "electrical": [
+      "CIRCUIT_NUMBER",
+      "BREAKER_RATING",
+      "POWER_SUPPLY",
+      "AMPERAGE",
+      "VOLTAGE",
+      "UPS_CONNECTION"
+    ],
+    "mechanical": [
+      "WATER_FLOW",
+      "WATER_PRESSURE",
+      "AIRFLOW",
+      "TEMPERATURE",
+      "PRESSURE",
+      "FLOW_RATE"
+    ],
+    "safety": [
+      "PPE_REQUIRED",
+      "LOCKOUT_TAGOUT",
+      "CONFINED_SPACE",
+      "HOT_WORK",
+      "EMERGENCY_CONTACT"
+    ],
+    "maintenance": [
+      "MAINTENANCE_SCHEDULE",
+      "PARTS_REQUIRED",
+      "VENDOR_SUPPORT",
+      "WARRANTY_INFO",
+      "SERVICE_CONTRACT"
+    ]
+  },
+  "templates": {
+    "operation": {
+      "name": "Operation Procedures",
+      "description": "Standard operating procedures for equipment",
+      "sections": [
+        "Equipment Information",
+        "Pre-Operation Checklist", 
+        "Startup Procedure",
+        "Normal Operation",
+        "Shutdown Procedure",
+        "Safety Requirements",
+        "Emergency Procedures"
+      ]
+    },
+    "maintenance": {
+      "name": "Maintenance Procedures", 
+      "description": "Preventive and corrective maintenance procedures",
+      "sections": [
+        "Equipment Information",
+        "Pre-Maintenance Checklist",
+        "Maintenance Procedure",
+        "Maintenance Schedule",
+        "Safety Requirements",
+        "Parts and Supplies",
+        "Emergency Procedures"
+      ]
+    },
+    "emergency": {
+      "name": "Emergency Procedures",
+      "description": "Emergency response and safety procedures", 
+      "sections": [
+        "Emergency Contacts",
+        "Fire Procedures",
+        "Electrical Emergency",
+        "Mechanical Emergency",
+        "Evacuation Procedures",
+        "Communication Protocols"
+      ]
+    },
+    "installation": {
+      "name": "Installation Procedures",
+      "description": "Equipment installation and commissioning procedures",
+      "sections": [
+        "Pre-Installation Checklist",
+        "Installation Steps",
+        "Commissioning Procedure", 
+        "Testing and Validation",
+        "Documentation Requirements",
+        "Handover Procedures"
+      ]
+    }
+  },
+  "aiFeatures": {
+    "smartMapping": {
+      "description": "AI-powered mapping of equipment data to procedure placeholders",
+      "confidenceThreshold": 0.8,
+      "learningEnabled": true
+    },
+    "complianceChecking": {
+      "description": "Ensure procedures meet industry standards (NFPA, OSHA, etc.)",
+      "standards": [
+        "NFPA_70E",
+        "OSHA_1910",
+        "ASHRAE_90.4",
+        "TIA_942"
+      ]
+    },
+    "riskAssessment": {
+      "description": "Identify potential safety hazards in procedures",
+      "riskCategories": [
+        "Electrical",
+        "Mechanical", 
+        "Chemical",
+        "Environmental"
+      ]
+    },
+    "optimization": {
+      "description": "Suggest improvements based on best practices",
+      "areas": [
+        "Efficiency",
+        "Safety",
+        "Maintainability",
+        "Compliance"
+      ]
+    }
+  },
+  "pricing": {
+    "tier1": {
+      "name": "Single Site",
+      "price": 2000,
+      "currency": "USD",
+      "period": "month",
+      "features": [
+        "Up to 1,000 equipment units",
+        "Basic procedure templates",
+        "Standard support"
+      ]
+    },
+    "tier2": {
+      "name": "Multi-Site", 
+      "price": 5000,
+      "currency": "USD",
+      "period": "month",
+      "features": [
+        "Up to 10,000 equipment units",
+        "Advanced AI features",
+        "Custom templates",
+        "Priority support"
+      ]
+    },
+    "tier3": {
+      "name": "Enterprise",
+      "price": 15000,
+      "currency": "USD", 
+      "period": "month",
+      "features": [
+        "Unlimited equipment",
+        "Full AI suite",
+        "Custom integrations",
+        "Dedicated support"
+      ]
+    }
+  }
+}
