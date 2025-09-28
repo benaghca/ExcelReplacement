@@ -170,12 +170,42 @@ The repository includes:
 
 You can use these to test the application.
 
-## New in this release
-- Template Preview and Validation feature
-  - Preview how your template will look with actual data
-  - Validate placeholders against CSV columns
-  - Catch errors before processing large batches
-- Placeholders are now replaced everywhere in your document, including tables, headers, and footers
-- Mixed formatting (bold, italics, etc.) is preserved when replacing placeholders
-- Output file type matches the template type (Excel or Word)
-- Output file type matches the template type (Excel or Word)
+## Version 3.0.0 - Major UI/UX Overhaul
+
+### 🎨 New Professional Interface
+- **Clean, modern design** - Replaced Matrix theme with professional blue/gray color scheme
+- **Improved typography** - System fonts for better readability
+- **Enhanced visual hierarchy** - Better spacing, shadows, and layout
+
+### 📁 Advanced File Name Configuration
+- **Interactive placeholder builder** - Click to add CSV column placeholders
+- **Real-time preview** - See filename pattern as you build it
+- **Smart suggestions** - Available placeholders displayed as clickable buttons
+- **Action buttons** - Quick add spaces, dashes, and underscores
+- **Persistent settings** - Your patterns are saved and remembered
+
+### 🗂️ Professional Template Manager
+- **Database-style table view** - Scalable interface for managing many templates
+- **Template preview panel** - See detailed info before loading
+- **Template organization** - Name, type, category, and date tracking
+- **Bulk operations** - Load, delete, and manage multiple templates
+- **Scrollable interface** - Handles 100+ templates efficiently
+
+### 🔧 Enhanced User Experience
+- **Drag & drop support** - Drop files directly into the application
+- **Better error handling** - Clear, actionable error messages
+- **Improved file dialogs** - Native file selection with proper filtering
+- **Status feedback** - Real-time progress and status updates
+- **Modal dialogs** - Professional popup interfaces for configuration
+
+### 🚀 Performance Improvements
+- **Faster file processing** - Optimized template processing
+- **Better memory management** - Efficient handling of large files
+- **Improved stability** - Reduced crashes and better error recovery
+- **Enhanced file validation** - Better template and CSV validation
+
+### 🛠️ Technical Improvements
+- **Modernized codebase** - Cleaner, more maintainable code
+- **Better separation of concerns** - Improved architecture
+- **Enhanced testing** - Comprehensive test coverage
+- **Improved documentation** - Better README and code comments
