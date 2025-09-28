@@ -11,7 +11,12 @@ namespace ExcelReplacement.Services
 
             using (var document = SpreadsheetDocument.Open(outputPath, true))
             {
-                var processor = new ExcelProcessor(document.WorkbookPart, record);
+                var workbookPart = document.WorkbookPart;
+                if (workbookPart == null)
+                {
+                    throw new InvalidOperationException($"Workbook part not found in Excel template: {templatePath}");
+                }
+                var processor = new ExcelProcessor(workbookPart, record);
                 processor.ProcessAllSheets();
             }
         }

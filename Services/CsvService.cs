@@ -42,7 +42,7 @@ namespace ExcelReplacement.Services
                         var record = new ExcelRecord();
                         foreach (var header in headers)
                         {
-                            record.Values[header] = csv.GetField(header);
+                            record.Values[header] = csv.GetField(header) ?? "";
                         }
                         records.Add(record);
                     }

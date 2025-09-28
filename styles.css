@@ -1,0 +1,178 @@
+:root {
+    --background-color: #1e1e1e;
+    --foreground-color: #00ff80;
+    --accent-color: #00ffc0;
+    --border-color: #00c000;
+    --hover-color: #006000;
+    --active-color: #008000;
+    --error-color: #ff4040;
+    --success-color: #00ff80;
+    --warning-color: #ffff00;
+    --info-color: #40c0ff;
+}
+
+body {
+    background-color: var(--background-color);
+    color: var(--foreground-color);
+    font-family: 'Consolas', monospace;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.input-group {
+    display: flex;
+    gap: 10px;
+}
+
+input[type="text"], select {
+    flex: 1;
+    padding: 8px;
+    background-color: rgba(30, 30, 30, 0.9);
+    color: var(--foreground-color);
+    border: 1px solid var(--border-color);
+    font-family: 'Consolas', monospace;
+}
+
+button {
+    padding: 8px 16px;
+    background-color: rgba(30, 30, 30, 0.9);
+    color: var(--foreground-color);
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    font-family: 'Consolas', monospace;
+    transition: background-color 0.2s;
+}
+
+button:hover {
+    background-color: var(--hover-color);
+}
+
+button:active {
+    background-color: var(--active-color);
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.process-button {
+    display: block;
+    width: 200px;
+    margin: 20px auto;
+    padding: 12px;
+    background-color: var(--accent-color);
+    color: var(--background-color);
+    border: none;
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: background-color 0.2s;
+}
+
+.process-button:hover {
+    background-color: var(--hover-color);
+}
+
+.status {
+    margin-top: 20px;
+    text-align: center;
+}
+
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: var(--background-color);
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid var(--border-color);
+    width: 80%;
+    max-width: 500px;
+}
+
+.progress-container {
+    margin: 20px 0;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 20px;
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    margin-bottom: 10px;
+}
+
+.progress {
+    width: 0%;
+    height: 100%;
+    background-color: var(--accent-color);
+    transition: width 0.3s;
+}
+
+.progress-text, .current-file {
+    text-align: center;
+    margin: 5px 0;
+}
+
+/* Error and success messages */
+.error {
+    color: var(--error-color);
+}
+
+.success {
+    color: var(--success-color);
+}
+
+.warning {
+    color: var(--warning-color);
+}
+
+.info {
+    color: var(--info-color);
+}
+
+#background-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(60, 60, 60, 0.7); /* Darker and slightly less transparent gray */
+    backdrop-filter: blur(3px); /* Reduced blur effect */
+    z-index: 0; /* Place it between the iframe and app content */
+}
+
+/* Add styles for your main content here */
+#app {
+    position: relative;
+} 

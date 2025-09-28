@@ -2,6 +2,7 @@ using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using ExcelReplacement.Models;
+using System.Linq;
 
 namespace ExcelReplacement.Services
 {
@@ -18,7 +19,8 @@ namespace ExcelReplacement.Services
 
         public void ProcessAllSheets()
         {
-            var sheets = _workbookPart.Workbook.Sheets.Cast<Sheet>();
+            if (_workbookPart.Workbook?.Sheets == null) return;
+            var sheets = _workbookPart.Workbook.Sheets.OfType<Sheet>();
             foreach (var sheet in sheets)
             {
                 ProcessSheet(sheet);
@@ -27,12 +29,15 @@ namespace ExcelReplacement.Services
 
         private void ProcessSheet(Sheet sheet)
         {
-            var worksheetPart = (WorksheetPart)_workbookPart.GetPartById(sheet.Id);
+            if (sheet?.Id?.Value == null) return;
+            var worksheetPart = _workbookPart.GetPartById(sheet.Id.Value) as WorksheetPart;
+            if (worksheetPart?.Worksheet == null) return;
+
             var sheetData = worksheetPart.Worksheet.Elements<SheetData>().FirstOrDefault();
 
             if (sheetData != null)
             {
-                foreach (var row in sheetData.Elements<Row>())
+                foreach (var row in sheetData.Elements<Row>().Where(r => r != null))
                 {
                     ProcessRow(row);
                 }
@@ -41,7 +46,7 @@ namespace ExcelReplacement.Services
 
         private void ProcessRow(Row row)
         {
-            foreach (var cell in row.Elements<Cell>())
+            foreach (var cell in row.Elements<Cell>().Where(c => c != null))
             {
                 ProcessCell(cell);
             }
@@ -62,47 +67,66 @@ namespace ExcelReplacement.Services
 
         private void ProcessSharedStringCell(Cell cell)
         {
-            int sharedStringIndex = int.Parse(cell.CellValue.Text);
-            var sharedStringItem = _workbookPart.SharedStringTablePart.SharedStringTable
-                .Elements<SharedStringItem>()
-                .ElementAt(sharedStringIndex);
+            if (cell.CellValue?.Text == null || _workbookPart.SharedStringTablePart?.SharedStringTable == null) return;
 
-            if (sharedStringItem.Text != null)
+            if (int.TryParse(cell.CellValue.Text, out int sharedStringIndex))
             {
-                ProcessSimpleText(sharedStringItem);
-            }
-            else if (sharedStringItem.Elements<Run>().Any())
-            {
-                ProcessFormattedText(sharedStringItem);
+                var sharedStringItem = _workbookPart.SharedStringTablePart.SharedStringTable
+                    .Elements<SharedStringItem>()
+                    .ElementAtOrDefault(sharedStringIndex);
+
+                if (sharedStringItem?.Text != null)
+                {
+                    ProcessSimpleText(sharedStringItem);
+                }
+                else if (sharedStringItem?.Elements<Run>().Any() == true)
+                {
+                    ProcessFormattedText(sharedStringItem);
+                }
             }
         }
 
         private void ProcessSimpleText(SharedStringItem sharedStringItem)
         {
+            if (sharedStringItem?.Text?.Text == null) return;
             string cellText = sharedStringItem.Text.Text;
             string processedText = ReplacePlaceholders(cellText);
-            sharedStringItem.Text = new Text(processedText);
+            sharedStringItem.Text.Text = processedText;
         }
 
         private void ProcessFormattedText(SharedStringItem sharedStringItem)
         {
-            foreach (var run in sharedStringItem.Elements<Run>())
+            if (sharedStringItem == null) return;
+            foreach (var run in sharedStringItem.Elements<Run>().Where(r => r != null))
             {
+                if (run?.Text?.Text == null) continue;
                 string runText = run.Text.Text;
                 string processedText = ReplacePlaceholders(runText);
-                run.Text = new Text(processedText) { Space = SpaceProcessingModeValues.Preserve };
+                run.Text.Text = processedText;
+                if (run.Text.Space?.Value == SpaceProcessingModeValues.Preserve)
+                {
+                    run.Text.Space = new EnumValue<SpaceProcessingModeValues>(SpaceProcessingModeValues.Preserve);
+                } else {
+                     // If no original space setting, ensure it's default
+                    run.Text.Space = null;
+                }
             }
         }
 
         private string ReplacePlaceholders(string text)
         {
             string result = text;
-            foreach (var key in _record.Values.Keys)
+            // Use null conditional access for _record.Values
+            if (_record?.Values != null)
             {
-                string placeholder = $"[{key}]";
-                if (result.Contains(placeholder))
+                foreach (var key in _record.Values.Keys)
                 {
-                    result = result.Replace(placeholder, _record.GetValue(key));
+                    string placeholder = $"[{key}]";
+                    if (result.Contains(placeholder))
+                    {
+                         // Use null conditional access for _record.GetValue(key)
+                        result = result.Replace(placeholder, _record.GetValue(key) ?? ""); 
+                    }
                 }
             }
             return result;

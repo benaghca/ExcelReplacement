@@ -130,12 +130,14 @@ namespace ExcelReplacement.Services
             using (var document = SpreadsheetDocument.Open(_templatePath, false))
             {
                 var workbookPart = document.WorkbookPart;
-                if (workbookPart == null) return;
+                if (workbookPart?.Workbook?.Sheets == null) return;
 
                 foreach (var sheet in workbookPart.Workbook.Sheets.Cast<Sheet>())
                 {
-                    if (sheet.Id?.Value == null) continue; // Skip if sheet ID is null
-                    var worksheetPart = (WorksheetPart)workbookPart.GetPartById(sheet.Id);
+                    if (sheet.Id?.Value == null) continue;
+                    var worksheetPart = workbookPart.GetPartById(sheet.Id.Value) as WorksheetPart;
+                    if (worksheetPart?.Worksheet == null) continue;
+
                     var sheetData = worksheetPart.Worksheet.Elements<SheetData>().FirstOrDefault();
 
                     if (sheetData != null)
@@ -144,7 +146,7 @@ namespace ExcelReplacement.Services
                         {
                             foreach (var cell in row.Elements<Cell>())
                             {
-                                string cellText = null;
+                                string? cellText = null;
                                 if (cell.DataType != null && cell.DataType == CellValues.SharedString && cell.CellValue != null)
                                 {
                                      if (int.TryParse(cell.CellValue.Text, out int ssIndex) && workbookPart.SharedStringTablePart?.SharedStringTable != null)
@@ -162,7 +164,7 @@ namespace ExcelReplacement.Services
 
                                 if (!string.IsNullOrEmpty(cellText))
                                 {
-                                    foreach (Match match in _placeholderRegex.Matches(cellText))
+                                    foreach (Match match in _placeholderRegex.Matches(cellText).Cast<Match>())
                                     {
                                         placeholders.Add(match.Value);
                                     }
@@ -185,20 +187,26 @@ namespace ExcelReplacement.Services
                 ProcessWordElementForPlaceholders(mainPart.Document.Body, placeholders);
 
                 // Process headers
-                foreach (var headerPart in mainPart.HeaderParts)
+                if (mainPart.HeaderParts != null)
                 {
-                    if (headerPart.Header != null)
+                    foreach (var headerPart in mainPart.HeaderParts)
                     {
-                        ProcessWordElementForPlaceholders(headerPart.Header, placeholders);
+                        if (headerPart?.Header != null)
+                        {
+                            ProcessWordElementForPlaceholders(headerPart.Header, placeholders);
+                        }
                     }
                 }
 
                 // Process footers
-                foreach (var footerPart in mainPart.FooterParts)
+                if (mainPart.FooterParts != null)
                 {
-                    if (footerPart.Footer != null)
+                    foreach (var footerPart in mainPart.FooterParts)
                     {
-                        ProcessWordElementForPlaceholders(footerPart.Footer, placeholders);
+                        if (footerPart?.Footer != null)
+                        {
+                            ProcessWordElementForPlaceholders(footerPart.Footer, placeholders);
+                        }
                     }
                 }
             }
@@ -206,21 +214,21 @@ namespace ExcelReplacement.Services
 
         private void ProcessWordElementForPlaceholders(OpenXmlElement element, HashSet<string> placeholders)
         {
-            foreach (var paragraph in element.Descendants<Paragraph>())
+            foreach (var paragraph in element.Descendants<Paragraph>().Where(p => p != null))
             {
-                var text = string.Join("", paragraph.Descendants<DocumentFormat.OpenXml.Wordprocessing.Text>().Select(t => t.Text));
-                 foreach (Match match in _placeholderRegex.Matches(text))
+                var text = string.Join("", paragraph.Descendants<DocumentFormat.OpenXml.Wordprocessing.Text>().Select(t => t.Text ?? ""));
+                 foreach (Match match in _placeholderRegex.Matches(text).Cast<Match>())
                 {
                     placeholders.Add(match.Value);
                 }
             }
              // Also check in Tables, Headers, Footers, etc. if needed
-             foreach (var table in element.Descendants<DocumentFormat.OpenXml.Wordprocessing.Table>())
+             foreach (var table in element.Descendants<DocumentFormat.OpenXml.Wordprocessing.Table>().Where(t => t != null))
              {
-                 foreach(var cell in table.Descendants<DocumentFormat.OpenXml.Wordprocessing.TableCell>())
+                 foreach(var cell in table.Descendants<DocumentFormat.OpenXml.Wordprocessing.TableCell>().Where(c => c != null))
                  {
-                      var cellText = string.Join("", cell.Descendants<DocumentFormat.OpenXml.Wordprocessing.Text>().Select(t => t.Text));
-                       foreach (Match match in _placeholderRegex.Matches(cellText))
+                      var cellText = string.Join("", cell.Descendants<DocumentFormat.OpenXml.Wordprocessing.Text>().Select(t => t.Text ?? ""));
+                       foreach (Match match in _placeholderRegex.Matches(cellText).Cast<Match>())
                         {
                             placeholders.Add(match.Value);
                         }

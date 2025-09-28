@@ -36,41 +36,60 @@ namespace ExcelReplacement.Services
             using (var document = SpreadsheetDocument.Open(templatePath, false))
             {
                 var workbookPart = document.WorkbookPart;
-                if (workbookPart == null) return "Error: Invalid Excel file";
+                if (workbookPart?.Workbook?.Sheets == null) return "Error: Invalid Excel file or missing sheets";
 
-                foreach (var sheet in workbookPart.Workbook.Sheets.Cast<Sheet>())
+                foreach (var sheet in workbookPart.Workbook.Sheets.OfType<Sheet>())
                 {
-                    preview.AppendLine($"\nSheet: {sheet.Name}");
+                    if (sheet?.Name == null || sheet.Id?.Value == null) continue;
+                    preview.AppendLine($"\nSheet: {sheet.Name.Value}");
                     preview.AppendLine("-------------------");
 
-                    var worksheetPart = (WorksheetPart)workbookPart.GetPartById(sheet.Id);
+                    var worksheetPart = workbookPart.GetPartById(sheet.Id.Value) as WorksheetPart;
+                    if (worksheetPart?.Worksheet == null) continue;
+
                     var sheetData = worksheetPart.Worksheet.Elements<SheetData>().FirstOrDefault();
 
                     if (sheetData != null)
                     {
-                        foreach (var row in sheetData.Elements<Row>())
+                        foreach (var row in sheetData.Elements<Row>().Where(r => r != null))
                         {
                             var rowContent = new List<string>();
-                            foreach (var cell in row.Elements<Cell>())
+                            foreach (var cell in row.Elements<Cell>().Where(c => c != null))
                             {
                                 if (cell.DataType != null && cell.DataType == CellValues.SharedString)
                                 {
-                                    var sharedStringItem = workbookPart.SharedStringTablePart.SharedStringTable
-                                        .Elements<SharedStringItem>()
-                                        .ElementAt(int.Parse(cell.CellValue.Text));
-
-                                    string cellText;
-                                    if (sharedStringItem.Text != null)
+                                    if (cell.CellValue?.Text == null || workbookPart.SharedStringTablePart?.SharedStringTable == null) 
                                     {
-                                        cellText = sharedStringItem.Text.Text;
+                                        rowContent.Add("");
+                                        continue;
+                                    }
+                                     if (int.TryParse(cell.CellValue.Text, out int ssIndex))
+                                    {
+                                        var sharedStringItem = workbookPart.SharedStringTablePart.SharedStringTable
+                                            .Elements<SharedStringItem>()
+                                            .ElementAtOrDefault(ssIndex);
+
+                                        string cellText;
+                                        if (sharedStringItem?.Text?.Text != null)
+                                        {
+                                            cellText = sharedStringItem.Text.Text;
+                                        }
+                                        else if (sharedStringItem?.Elements<DocumentFormat.OpenXml.Spreadsheet.Run>().Any() == true)
+                                        {
+                                            cellText = string.Join("", sharedStringItem.Elements<DocumentFormat.OpenXml.Spreadsheet.Run>().Select(r => r.Text?.Text ?? ""));
+                                        }
+                                        else
+                                        {
+                                            cellText = "";
+                                        }
+
+                                        cellText = ReplacePlaceholders(cellText, sampleRecord);
+                                        rowContent.Add(cellText);
                                     }
                                     else
                                     {
-                                        cellText = string.Join("", sharedStringItem.Elements<DocumentFormat.OpenXml.Spreadsheet.Run>().Select(r => r.Text.Text));
+                                        rowContent.Add("Error: Invalid shared string index");
                                     }
-
-                                    cellText = ReplacePlaceholders(cellText, sampleRecord);
-                                    rowContent.Add(cellText);
                                 }
                                 else
                                 {
@@ -99,7 +118,7 @@ namespace ExcelReplacement.Services
             using (var document = WordprocessingDocument.Open(templatePath, false))
             {
                 var mainPart = document.MainDocumentPart;
-                if (mainPart?.Document?.Body == null) return "Error: Invalid Word file";
+                if (mainPart?.Document?.Body == null) return "Error: Invalid Word file or empty body";
 
                 // Process body
                 preview.AppendLine("\nDocument Body");
@@ -107,24 +126,30 @@ namespace ExcelReplacement.Services
                 ProcessWordElement(mainPart.Document.Body, preview, sampleRecord);
 
                 // Process headers
-                foreach (var headerPart in mainPart.HeaderParts)
+                if (mainPart.HeaderParts != null)
                 {
-                    if (headerPart.Header != null)
+                    foreach (var headerPart in mainPart.HeaderParts)
                     {
-                        preview.AppendLine("\nHeader");
-                        preview.AppendLine("------");
-                        ProcessWordElement(headerPart.Header, preview, sampleRecord);
+                        if (headerPart?.Header != null)
+                        {
+                            preview.AppendLine("\nHeader");
+                            preview.AppendLine("------");
+                            ProcessWordElement(headerPart.Header, preview, sampleRecord);
+                        }
                     }
                 }
 
                 // Process footers
-                foreach (var footerPart in mainPart.FooterParts)
+                if (mainPart.FooterParts != null)
                 {
-                    if (footerPart.Footer != null)
+                    foreach (var footerPart in mainPart.FooterParts)
                     {
-                        preview.AppendLine("\nFooter");
-                        preview.AppendLine("------");
-                        ProcessWordElement(footerPart.Footer, preview, sampleRecord);
+                        if (footerPart?.Footer != null)
+                        {
+                            preview.AppendLine("\nFooter");
+                            preview.AppendLine("------");
+                            ProcessWordElement(footerPart.Footer, preview, sampleRecord);
+                        }
                     }
                 }
             }
@@ -134,13 +159,26 @@ namespace ExcelReplacement.Services
 
         private void ProcessWordElement(OpenXmlElement element, StringBuilder preview, ExcelRecord sampleRecord)
         {
-            foreach (var paragraph in element.Descendants<Paragraph>())
+            foreach (var paragraph in element.Descendants<Paragraph>().Where(p => p != null))
             {
-                var text = string.Join("", paragraph.Descendants<DocumentFormat.OpenXml.Wordprocessing.Text>().Select(t => t.Text));
+                var text = string.Join("", paragraph.Descendants<DocumentFormat.OpenXml.Wordprocessing.Text>().Select(t => t.Text ?? ""));
                 if (!string.IsNullOrWhiteSpace(text))
                 {
                     text = ReplacePlaceholders(text, sampleRecord);
                     preview.AppendLine(text);
+                }
+            }
+            
+            foreach (var table in element.Descendants<DocumentFormat.OpenXml.Wordprocessing.Table>().Where(t => t != null))
+            {
+                foreach(var cell in table.Descendants<DocumentFormat.OpenXml.Wordprocessing.TableCell>().Where(c => c != null))
+                {
+                    var cellText = string.Join("", cell.Descendants<DocumentFormat.OpenXml.Wordprocessing.Text>().Select(t => t.Text ?? ""));
+                    if (!string.IsNullOrWhiteSpace(cellText))
+                    {
+                        cellText = ReplacePlaceholders(cellText, sampleRecord);
+                        preview.AppendLine($"Table Cell: {cellText}");
+                    }
                 }
             }
         }
@@ -150,7 +188,7 @@ namespace ExcelReplacement.Services
             return _placeholderRegex.Replace(text, match =>
             {
                 var fieldName = match.Groups[1].Value;
-                return sampleRecord.GetValue(fieldName) ?? match.Value;
+                return sampleRecord.GetValue(fieldName) ?? match.Value ?? "";
             });
         }
     }

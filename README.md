@@ -1,6 +1,12 @@
-# Document Template Processor
+# Excel Replacement - Document Template Processor
 
-A Windows application that processes Excel and Word templates by replacing placeholders with data from a CSV file.
+A cross-platform desktop application built with Electron and .NET that processes Excel and Word templates by replacing placeholders with data from a CSV file.
+
+## Architecture
+
+This application consists of two main parts:
+- **Frontend**: Electron-based desktop app with TypeScript/JavaScript
+- **Backend**: .NET 8 Web API that handles file processing
 
 ## What it does
 
@@ -13,25 +19,38 @@ This tool allows you to:
 
 ## How to use
 
-1. **Build the application**:
+### Development Setup
+
+1. **Install dependencies**:
+   ```bash
+   npm install
    ```
+
+2. **Build the backend**:
+   ```bash
    dotnet build
    ```
 
-2. **Run the application**:
-   ```
+3. **Start the backend** (in one terminal):
+   ```bash
    dotnet run
    ```
 
-3. **Using the application**:
-   - Select the template type (Excel or Word)
-   - Select your CSV file with replacement data
-   - Select your template file with placeholders
-   - Click "Preview Template" to validate your setup
-   - Choose an output directory for the generated files
-   - Click "Process Files" to start
-   - The application will process the files and display progress
-   - When complete, you'll see a summary of the processed records
+4. **Start the frontend** (in another terminal):
+   ```bash
+   npm run dev
+   ```
+
+### Using the application
+
+1. **Select the template type** (Excel or Word)
+2. **Select your CSV file** with replacement data
+3. **Select your template file** with placeholders
+4. **Click "Preview Template"** to validate your setup
+5. **Choose an output directory** for the generated files
+6. **Click "Process Files"** to start
+7. The application will process the files and display progress
+8. When complete, you'll see a summary of the processed records
 
 ## Template Preview and Validation
 
@@ -53,23 +72,35 @@ The preview feature helps you catch issues before processing large batches:
    - Highlights unused CSV columns
    - Indicates missing placeholders
 
-## Distribution for non-developers
+## Building for Distribution
 
-You can distribute the application as a standalone executable that doesn't require .NET SDK installation:
+### Backend Distribution
 
-1. **Publish as a self-contained, single-file application**:
-   ```
+1. **Publish the .NET backend**:
+   ```bash
    dotnet publish -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true
    ```
 
-2. **Locate the executable**:
-   - The executable will be in the `bin\Release\net6.0-windows\win-x64\publish` directory
+2. **Locate the backend executable**:
+   - The executable will be in the `bin\Release\net8.0\win-x64\publish` directory
    - The file will be named `ExcelReplacement.exe`
 
-3. **Distribute to users**:
-   - Users can run the application by double-clicking the .exe file
-   - No installation or administrative privileges required
-   - The application can be run from any location, including USB drives
+### Frontend Distribution
+
+1. **Build the Electron app**:
+   ```bash
+   npm run build
+   ```
+
+2. **Locate the built app**:
+   - The built app will be in the `dist` directory
+   - For Windows: `dist/win-unpacked/excel-replacement.exe`
+
+### Complete Distribution
+
+The application requires both the backend and frontend to be running:
+- Start the backend: `dotnet run` or run the published executable
+- Start the frontend: `npm run dev` or run the built Electron app
 
 ## File requirements
 
@@ -146,4 +177,5 @@ You can use these to test the application.
   - Catch errors before processing large batches
 - Placeholders are now replaced everywhere in your document, including tables, headers, and footers
 - Mixed formatting (bold, italics, etc.) is preserved when replacing placeholders
+- Output file type matches the template type (Excel or Word)
 - Output file type matches the template type (Excel or Word)

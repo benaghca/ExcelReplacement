@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "9br/GxQgoNA=",
+  "dgSpecHash": "x6Wcl7FoNL4=",
   "success": true,
   "projectFilePath": "C:\\Users\\chris\\workspaces\\github\\benaghca\\ExcelReplacement\\ExcelReplacement.csproj",
   "expectedPackageFiles": [
@@ -9,6 +9,8 @@
     "C:\\Users\\chris\\.nuget\\packages\\epplus\\7.0.8\\epplus.7.0.8.nupkg.sha512",
     "C:\\Users\\chris\\.nuget\\packages\\epplus.interfaces\\6.1.1\\epplus.interfaces.6.1.1.nupkg.sha512",
     "C:\\Users\\chris\\.nuget\\packages\\epplus.system.drawing\\6.1.1\\epplus.system.drawing.6.1.1.nupkg.sha512",
+    "C:\\Users\\chris\\.nuget\\packages\\microsoft.aspnetcore.openapi\\8.0.5\\microsoft.aspnetcore.openapi.8.0.5.nupkg.sha512",
+    "C:\\Users\\chris\\.nuget\\packages\\microsoft.extensions.apidescription.server\\6.0.5\\microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512",
     "C:\\Users\\chris\\.nuget\\packages\\microsoft.extensions.configuration\\8.0.0\\microsoft.extensions.configuration.8.0.0.nupkg.sha512",
     "C:\\Users\\chris\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\8.0.0\\microsoft.extensions.configuration.abstractions.8.0.0.nupkg.sha512",
     "C:\\Users\\chris\\.nuget\\packages\\microsoft.extensions.configuration.fileextensions\\8.0.0\\microsoft.extensions.configuration.fileextensions.8.0.0.nupkg.sha512",
@@ -18,7 +20,13 @@
     "C:\\Users\\chris\\.nuget\\packages\\microsoft.extensions.filesystemglobbing\\8.0.0\\microsoft.extensions.filesystemglobbing.8.0.0.nupkg.sha512",
     "C:\\Users\\chris\\.nuget\\packages\\microsoft.extensions.primitives\\8.0.0\\microsoft.extensions.primitives.8.0.0.nupkg.sha512",
     "C:\\Users\\chris\\.nuget\\packages\\microsoft.io.recyclablememorystream\\3.0.0\\microsoft.io.recyclablememorystream.3.0.0.nupkg.sha512",
+    "C:\\Users\\chris\\.nuget\\packages\\microsoft.net.illink.tasks\\8.0.14\\microsoft.net.illink.tasks.8.0.14.nupkg.sha512",
+    "C:\\Users\\chris\\.nuget\\packages\\microsoft.openapi\\1.4.3\\microsoft.openapi.1.4.3.nupkg.sha512",
     "C:\\Users\\chris\\.nuget\\packages\\microsoft.win32.systemevents\\7.0.0\\microsoft.win32.systemevents.7.0.0.nupkg.sha512",
+    "C:\\Users\\chris\\.nuget\\packages\\swashbuckle.aspnetcore\\6.4.0\\swashbuckle.aspnetcore.6.4.0.nupkg.sha512",
+    "C:\\Users\\chris\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\6.4.0\\swashbuckle.aspnetcore.swagger.6.4.0.nupkg.sha512",
+    "C:\\Users\\chris\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\6.4.0\\swashbuckle.aspnetcore.swaggergen.6.4.0.nupkg.sha512",
+    "C:\\Users\\chris\\.nuget\\packages\\swashbuckle.aspnetcore.swaggerui\\6.4.0\\swashbuckle.aspnetcore.swaggerui.6.4.0.nupkg.sha512",
     "C:\\Users\\chris\\.nuget\\packages\\system.componentmodel.annotations\\5.0.0\\system.componentmodel.annotations.5.0.0.nupkg.sha512",
     "C:\\Users\\chris\\.nuget\\packages\\system.drawing.common\\7.0.0\\system.drawing.common.7.0.0.nupkg.sha512",
     "C:\\Users\\chris\\.nuget\\packages\\system.formats.asn1\\8.0.0\\system.formats.asn1.8.0.0.nupkg.sha512",
@@ -28,8 +36,11 @@
     "C:\\Users\\chris\\.nuget\\packages\\system.text.encodings.web\\8.0.0\\system.text.encodings.web.8.0.0.nupkg.sha512",
     "C:\\Users\\chris\\.nuget\\packages\\system.text.json\\8.0.0\\system.text.json.8.0.0.nupkg.sha512",
     "C:\\Users\\chris\\.nuget\\packages\\microsoft.netcore.app.ref\\8.0.14\\microsoft.netcore.app.ref.8.0.14.nupkg.sha512",
+    "C:\\Users\\chris\\.nuget\\packages\\microsoft.netcore.app.runtime.win-x64\\8.0.14\\microsoft.netcore.app.runtime.win-x64.8.0.14.nupkg.sha512",
     "C:\\Users\\chris\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\8.0.14\\microsoft.windowsdesktop.app.ref.8.0.14.nupkg.sha512",
+    "C:\\Users\\chris\\.nuget\\packages\\microsoft.windowsdesktop.app.runtime.win-x64\\8.0.14\\microsoft.windowsdesktop.app.runtime.win-x64.8.0.14.nupkg.sha512",
     "C:\\Users\\chris\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\8.0.14\\microsoft.aspnetcore.app.ref.8.0.14.nupkg.sha512",
+    "C:\\Users\\chris\\.nuget\\packages\\microsoft.aspnetcore.app.runtime.win-x64\\8.0.14\\microsoft.aspnetcore.app.runtime.win-x64.8.0.14.nupkg.sha512",
     "C:\\Users\\chris\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\8.0.14\\microsoft.netcore.app.host.win-x64.8.0.14.nupkg.sha512"
   ],
   "logs": []
