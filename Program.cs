@@ -1,4 +1,4 @@
-﻿using ExcelReplacement.Services;
+﻿﻿using ExcelReplacement.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,14 +14,15 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Configure CORS
+// Configure CORS - Restrict to localhost only
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowElectronApp",
         builder => builder
-            .WithOrigins("file://")
+            .WithOrigins("http://localhost:*", "https://localhost:*", "file://")
             .AllowAnyMethod()
-            .AllowAnyHeader());
+            .AllowAnyHeader()
+            .SetIsOriginAllowedToAllowWildcardSubdomains());
 });
 
 // Register services

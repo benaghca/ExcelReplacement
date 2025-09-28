@@ -38,6 +38,12 @@ namespace ExcelReplacement.Services
         {
             try
             {
+                // Validate file paths for security
+                if (!IsValidFilePath(request.CsvFilePath) || !IsValidFilePath(request.TemplatePath) || !IsValidFilePath(request.OutputPath))
+                {
+                    return BadRequest(new { error = "Invalid file path detected." });
+                }
+
                 // Ensure output directory exists
                 if (!Directory.Exists(request.OutputPath))
                 {
@@ -91,6 +97,12 @@ namespace ExcelReplacement.Services
         {
             try
             {
+                // Validate file paths for security
+                if (!IsValidFilePath(request.CsvFilePath) || !IsValidFilePath(request.TemplatePath))
+                {
+                    return BadRequest(new { error = "Invalid file path detected." });
+                }
+
                 var records = _csvService.LoadCsvData(request.CsvFilePath);
                 var sampleRecord = records.FirstOrDefault();
                 if (sampleRecord == null)
@@ -343,6 +355,23 @@ namespace ExcelReplacement.Services
                     content.Append(textElement.Text).Append(" ");
                 }
             }
+        }
+        
+        private bool IsValidFilePath(string filePath)
+        {
+            if (string.IsNullOrEmpty(filePath))
+                return false;
+                
+            // Check for path traversal attacks
+            if (filePath.Contains("..") || filePath.Contains("~"))
+                return false;
+                
+            // Check for absolute paths outside allowed directories
+            var fullPath = Path.GetFullPath(filePath);
+            var currentDir = Path.GetFullPath(Directory.GetCurrentDirectory());
+            
+            // Ensure the file is within the current directory or subdirectories
+            return fullPath.StartsWith(currentDir, StringComparison.OrdinalIgnoreCase);
         }
     }
 

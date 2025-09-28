@@ -121,6 +121,18 @@ async function browseCsvFile() {
             
             if (result && !result.canceled && result.filePaths.length > 0) {
                 const filePath = result.filePaths[0];
+                
+                // Security: Validate file type and path
+                if (!filePath.toLowerCase().endsWith('.csv')) {
+                    updateStatus('Please select a valid CSV file.', 'error');
+                    return;
+                }
+                
+                if (filePath.includes('..') || filePath.includes('~')) {
+                    updateStatus('Invalid file path detected.', 'error');
+                    return;
+                }
+                
                 document.getElementById('csvFile').value = filePath;
                 updateStatus(`CSV file selected: ${filePath}`, 'success');
                 
@@ -151,6 +163,20 @@ async function browseTemplateFile() {
             
             if (result && !result.canceled && result.filePaths.length > 0) {
                 const filePath = result.filePaths[0];
+                
+                // Security: Validate file type and path
+                const allowedExtensions = templateType === 'excel' ? ['.xlsx', '.xls'] : ['.docx', '.doc'];
+                const fileExt = filePath.toLowerCase().substring(filePath.lastIndexOf('.'));
+                if (!allowedExtensions.includes(fileExt)) {
+                    updateStatus(`Please select a valid ${templateType} file.`, 'error');
+                    return;
+                }
+                
+                if (filePath.includes('..') || filePath.includes('~')) {
+                    updateStatus('Invalid file path detected.', 'error');
+                    return;
+                }
+                
                 document.getElementById('templateFile').value = filePath;
                 updateStatus(`${templateType.toUpperCase()} template selected: ${filePath}`, 'success');
                 
