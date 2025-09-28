@@ -28,6 +28,13 @@ namespace ExcelReplacement.Services
             var body = _mainDocumentPart?.Document?.Body;
             if (body == null) return;
 
+            // Debug: Log what replacements we have
+            Console.WriteLine($"WordProcessor: Processing document with {_replacements.Count} replacements");
+            foreach (var kvp in _replacements)
+            {
+                Console.WriteLine($"  [{kvp.Key}] -> {kvp.Value}");
+            }
+
             ProcessElementForParagraphs(body);
 
             if (_mainDocumentPart.HeaderParts != null)
@@ -71,100 +78,54 @@ namespace ExcelReplacement.Services
             var runs = paragraph.Elements<Run>().ToList();
             if (runs.Count == 0) return;
 
-            var runTexts = runs.Select(r => r.GetFirstChild<Text>()?.Text ?? "").ToList();
-            var fullText = string.Concat(runTexts);
-            if (string.IsNullOrEmpty(fullText)) return;
-
-            var matches = _placeholderRegex.Matches(fullText);
-
-            if (matches.Count == 0) return;
-
-            var newRuns = new List<Run>();
-            int textPos = 0;
-            int runIdx = 0;
-            int runCharIdx = 0;
-
-            foreach (Match match in matches)
+            // Create a mapping for common placeholder variations
+            var placeholderMapping = new Dictionary<string, string>
             {
-                while (textPos < match.Index)
-                {
-                    if (runIdx >= runs.Count) break;
+                { "[Panel]", "[Panel-1]" },
+                { "[Breaker]", "[Breaker-1]" }
+            };
 
-                    var run = runs[runIdx];
-                    var runText = runTexts[runIdx];
-                    int charsLeftInRun = runText.Length - runCharIdx;
-                    int charsToCopy = Math.Min(charsLeftInRun, match.Index - textPos);
+            // Process each run individually to preserve formatting
+            foreach (var run in runs)
+            {
+                var textElement = run.GetFirstChild<Text>();
+                if (textElement?.Text == null) continue;
 
-                    if (charsToCopy > 0)
-                    {
-                        var textToCopy = runText.Substring(runCharIdx, charsToCopy);
-                        var newRun = new Run();
-                        if (run.RunProperties != null)
-                            newRun.RunProperties = run.RunProperties.CloneNode(true) as RunProperties;
-                        newRun.AppendChild(new Text(textToCopy) { Space = SpaceProcessingModeValues.Preserve });
-                        newRuns.Add(newRun);
-                        runCharIdx += charsToCopy;
-                        textPos += charsToCopy;
-                    }
+                string originalText = textElement.Text;
+                string processedText = originalText;
 
-                    if (runCharIdx >= runText.Length)
-                    {
-                        runIdx++;
-                        runCharIdx = 0;
-                    }
-                }
+                // Check if this run contains any placeholders
+                var matches = _placeholderRegex.Matches(originalText);
+                if (matches.Count == 0) continue;
 
-                if (runIdx >= runs.Count) break;
+                Console.WriteLine($"WordProcessor: Processing run with text: '{originalText}'");
 
-                var placeholder = match.Value;
-                string replacement = _replacements.TryGetValue(placeholder, out var val) ? (val ?? "") : placeholder;
+                // Process matches in reverse order to maintain indices
+                var sortedMatches = matches.Cast<Match>().OrderByDescending(m => m.Index).ToList();
                 
-                var replacementRun = new Run();
-                if (runs[runIdx].RunProperties != null)
-                    replacementRun.RunProperties = runs[runIdx].RunProperties.CloneNode(true) as RunProperties;
-                replacementRun.AppendChild(new Text(replacement) { Space = SpaceProcessingModeValues.Preserve });
-                newRuns.Add(replacementRun);
-                textPos += placeholder.Length;
-
-                int charsToAdvance = placeholder.Length;
-                while (charsToAdvance > 0 && runIdx < runs.Count)
+                foreach (var match in sortedMatches)
                 {
-                    var runText = runTexts[runIdx];
-                    int charsLeftInRun = runText.Length - runCharIdx;
-                    if (charsToAdvance < charsLeftInRun)
-                    {
-                        runCharIdx += charsToAdvance;
-                        charsToAdvance = 0;
-                    }
-                    else
-                    {
-                        charsToAdvance -= charsLeftInRun;
-                        runIdx++;
-                        runCharIdx = 0;
-                    }
+                    var placeholder = match.Value;
+                    Console.WriteLine($"  Found placeholder: {placeholder}");
+                    
+                    // Try to find a replacement using the mapping first
+                    string mappedPlaceholder = placeholderMapping.TryGetValue(placeholder, out var mapped) ? mapped : placeholder;
+                    
+                    // Extract the key from the placeholder (remove brackets)
+                    string key = mappedPlaceholder.Trim('[', ']');
+                    string replacement = _replacements.TryGetValue(key, out var val) ? (val ?? "") : placeholder;
+                    
+                    Console.WriteLine($"  Replacing {placeholder} -> {mappedPlaceholder} -> {replacement}");
+                    
+                    // Replace in the processed text
+                    processedText = processedText.Substring(0, match.Index) + replacement + processedText.Substring(match.Index + match.Length);
                 }
-            }
 
-            while (runIdx < runs.Count)
-            {
-                var run = runs[runIdx];
-                var runText = runTexts[runIdx];
-                if (runCharIdx < runText.Length)
-                {
-                    var textToCopy = runText.Substring(runCharIdx);
-                    var newRun = new Run();
-                    if (run.RunProperties != null)
-                        newRun.RunProperties = run.RunProperties.CloneNode(true) as RunProperties;
-                    newRun.AppendChild(new Text(textToCopy) { Space = SpaceProcessingModeValues.Preserve });
-                    newRuns.Add(newRun);
-                }
-                runIdx++;
-                runCharIdx = 0;
-            }
+                Console.WriteLine($"WordProcessor: Final processed text: '{processedText}'");
 
-            paragraph.RemoveAllChildren<Run>();
-            foreach (var run in newRuns)
-                paragraph.AppendChild(run);
+                // Update the text in this run only
+                textElement.Text = processedText;
+            }
         }
     }
 } 

@@ -48,6 +48,12 @@
                     <input type="text" id="csvFile" readonly>
                     <button id="browseCsv">Browse...</button>
                 </div>
+                <div class="drop-zone" id="csvDropZone">
+                    <div class="drop-zone-content">
+                        <div class="drop-zone-icon">📄</div>
+                        <div class="drop-zone-text">Drop CSV file here or click Browse</div>
+                    </div>
+                </div>
             </div>
 
             <div class="form-group">
@@ -56,6 +62,12 @@
                     <input type="text" id="templateFile" readonly>
                     <button id="browseTemplate">Browse...</button>
                 </div>
+                <div class="drop-zone" id="templateDropZone">
+                    <div class="drop-zone-content">
+                        <div class="drop-zone-icon">📊</div>
+                        <div class="drop-zone-text">Drop Excel/Word template here or click Browse</div>
+                    </div>
+                </div>
             </div>
 
             <div class="form-group">
@@ -63,6 +75,12 @@
                 <div class="input-group">
                     <input type="text" id="outputDir" readonly>
                     <button id="browseOutput">Browse...</button>
+                </div>
+                <div class="drop-zone" id="outputDropZone">
+                    <div class="drop-zone-content">
+                        <div class="drop-zone-icon">📁</div>
+                        <div class="drop-zone-text">Drop folder here or click Browse</div>
+                    </div>
                 </div>
             </div>
 
@@ -91,6 +109,25 @@
             </div>
         </div>
     </div>
-    <script src="./dist/renderer.js"></script>
+    <script src="./minimal-app.js"></script>
+    <script>
+        // Test Electron API availability
+        setTimeout(() => {
+            console.log('=== ELECTRON API TEST ===');
+            console.log('window.require:', window.require);
+            console.log('typeof window.require:', typeof window.require);
+            
+            if (window.require) {
+                console.log('Electron API is available!');
+                document.getElementById('status').textContent = 'Electron API is available!';
+                document.getElementById('status').className = 'status success';
+            } else {
+                console.log('Electron API is NOT available');
+                document.getElementById('status').textContent = 'Electron API is NOT available - check console for errors';
+                document.getElementById('status').className = 'status error';
+            }
+            document.getElementById('status').style.display = 'block';
+        }, 2000);
+    </script>
 </body>
 </html> 

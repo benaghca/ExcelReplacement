@@ -4,6 +4,42 @@ import Store from 'electron-store';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 
+// Set up IPC handlers for file dialogs
+function setupIpcHandlers(): void {
+    ipcMain.handle('select-csv-file', async () => {
+        const result = await dialog.showOpenDialog({
+            properties: ['openFile'],
+            filters: [
+                { name: 'CSV Files', extensions: ['csv'] },
+                { name: 'All Files', extensions: ['*'] }
+            ]
+        });
+        return result.canceled ? null : result.filePaths[0];
+    });
+
+    ipcMain.handle('select-template-file', async (event, type: string) => {
+        const filters = type === 'excel' 
+            ? [{ name: 'Excel Files', extensions: ['xlsx', 'xls'] }]
+            : [{ name: 'Word Files', extensions: ['docx', 'doc'] }];
+            
+        const result = await dialog.showOpenDialog({
+            properties: ['openFile'],
+            filters: [
+                ...filters,
+                { name: 'All Files', extensions: ['*'] }
+            ]
+        });
+        return result.canceled ? null : result.filePaths[0];
+    });
+
+    ipcMain.handle('select-output-directory', async () => {
+        const result = await dialog.showOpenDialog({
+            properties: ['openDirectory']
+        });
+        return result.canceled ? null : result.filePaths[0];
+    });
+}
+
 // Initialize store
 const store = new Store();
 
@@ -24,6 +60,9 @@ function createWindow(): void {
             contextIsolation: false
         }
     });
+
+    // Set up IPC handlers
+    setupIpcHandlers();
 
     mainWindow.loadFile('index.html');
 

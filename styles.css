@@ -50,6 +50,17 @@ input[type="text"], select {
     color: var(--foreground-color);
     border: 1px solid var(--border-color);
     font-family: 'Consolas', monospace;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 5px rgba(0, 255, 192, 0.3);
+}
+
+select:hover {
+    border-color: var(--accent-color);
 }
 
 button {
@@ -175,4 +186,51 @@ button:active {
 /* Add styles for your main content here */
 #app {
     position: relative;
+}
+
+/* Drop zone styles */
+.drop-zone {
+    border: 2px dashed var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 10px;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    background-color: rgba(0, 192, 0, 0.05);
+}
+
+.drop-zone:hover {
+    border-color: var(--accent-color);
+    background-color: rgba(0, 255, 192, 0.1);
+    transform: translateY(-2px);
+}
+
+.drop-zone.drag-over {
+    border-color: var(--accent-color);
+    background-color: rgba(0, 255, 192, 0.2);
+    transform: scale(1.02);
+}
+
+.drop-zone.has-file {
+    border-color: var(--success-color);
+    background-color: rgba(0, 255, 128, 0.1);
+}
+
+.drop-zone-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.drop-zone-icon {
+    font-size: 2em;
+    opacity: 0.7;
+}
+
+.drop-zone-text {
+    color: var(--foreground-color);
+    font-size: 14px;
+    opacity: 0.8;
 } 
