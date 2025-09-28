@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel Replacement - Data Center Procedure Automation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+        
+        .cta-button {
+            background: #ff6b6b;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.3s;
+        }
+        
+        .cta-button:hover {
+            background: #ff5252;
+        }
+        
+        .features {
+            padding: 80px 0;
+            background: #f8f9fa;
+        }
+        
+        .features h2 {
+            text-align: center;
+            margin-bottom: 50px;
+            font-size: 2.5rem;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+        
+        .feature {
+            text-align: center;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .feature h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+        
+        .pricing {
+            padding: 80px 0;
+            background: white;
+        }
+        
+        .pricing h2 {
+            text-align: center;
+            margin-bottom: 50px;
+            font-size: 2.5rem;
+        }
+        
+        .pricing-card {
+            max-width: 400px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .pricing-card h3 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        
+        .price {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .price-period {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 30px;
+        }
+        
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+        
+        .pricing-features li {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .pricing-features li:last-child {
+            border-bottom: none;
+        }
+        
+        .roi-calculator {
+            background: #f8f9fa;
+            padding: 60px 0;
+        }
+        
+        .roi-calculator h2 {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 2.5rem;
+        }
+        
+        .calculator {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .calculator h3 {
+            margin-bottom: 30px;
+            text-align: center;
+            color: #667eea;
+        }
+        
+        .calculator-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .calculator-row:last-child {
+            border-bottom: none;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #28a745;
+        }
+        
+        .testimonial {
+            background: #667eea;
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+        }
+        
+        .testimonial h2 {
+            margin-bottom: 40px;
+            font-size: 2.5rem;
+        }
+        
+        .testimonial-content {
+            max-width: 800px;
+            margin: 0 auto;
+            font-size: 1.2rem;
+            font-style: italic;
+        }
+        
+        .testimonial-author {
+            margin-top: 30px;
+            font-weight: bold;
+        }
+        
+        .footer {
+            background: #333;
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .calculator-row {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <h1>Stop Writing Procedures Manually</h1>
+            <p>Automate your data center procedure writing with AI-powered templates</p>
+            <a href="#pricing" class="cta-button">Get Started - $2,500/year</a>
+        </div>
+    </div>
+
+    <div class="features">
+        <div class="container">
+            <h2>Why Engineers Choose Excel Replacement</h2>
+            <div class="features-grid">
+                <div class="feature">
+                    <h3>🤖 AI-Powered Mapping</h3>
+                    <p>Connect to your existing database and let AI automatically map equipment data to procedure templates. No more manual data entry.</p>
+                </div>
+                <div class="feature">
+                    <h3>📋 Industry Templates</h3>
+                    <p>Pre-built templates for CRAH, UPS, PDU, CRAC, and more. All procedures follow industry best practices and standards.</p>
+                </div>
+                <div class="feature">
+                    <h3>⚡ 10x Faster</h3>
+                    <p>Generate procedures in minutes instead of hours. What used to take 8 hours now takes 30 minutes.</p>
+                </div>
+                <div class="feature">
+                    <h3>🔗 Database Integration</h3>
+                    <p>Connect to SQL Server, MySQL, PostgreSQL, or Excel files. Your equipment data stays in your existing systems.</p>
+                </div>
+                <div class="feature">
+                    <h3>📱 Mobile Ready</h3>
+                    <p>Access your procedures on any device. Perfect for field technicians and maintenance crews.</p>
+                </div>
+                <div class="feature">
+                    <h3>🛡️ Compliance Ready</h3>
+                    <p>All procedures meet NFPA, OSHA, and ASHRAE standards. Reduce liability with consistent documentation.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="pricing" id="pricing">
+        <div class="container">
+            <h2>Simple Pricing - One Price, All Features</h2>
+            <div class="pricing-card">
+                <h3>Engineer License</h3>
+                <div class="price">$2,500</div>
+                <div class="price-period">per year</div>
+                <ul class="pricing-features">
+                    <li>✅ Unlimited procedures</li>
+                    <li>✅ All equipment templates</li>
+                    <li>✅ Database connectivity</li>
+                    <li>✅ AI-powered mapping</li>
+                    <li>✅ Cloud storage & sync</li>
+                    <li>✅ Mobile access</li>
+                    <li>✅ Email support</li>
+                    <li>✅ Regular updates</li>
+                </ul>
+                <a href="#" class="cta-button">Start Free Trial</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="roi-calculator">
+        <div class="container">
+            <h2>ROI Calculator</h2>
+            <div class="calculator">
+                <h3>See How Much You'll Save</h3>
+                <div class="calculator-row">
+                    <span>Your hourly rate:</span>
+                    <span>$50/hour</span>
+                </div>
+                <div class="calculator-row">
+                    <span>Hours saved per year:</span>
+                    <span>100 hours</span>
+                </div>
+                <div class="calculator-row">
+                    <span>Annual time savings:</span>
+                    <span>$5,000</span>
+                </div>
+                <div class="calculator-row">
+                    <span>Software cost:</span>
+                    <span>-$2,500</span>
+                </div>
+                <div class="calculator-row">
+                    <span>Net savings:</span>
+                    <span>$2,500 (100% ROI)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="testimonial">
+        <div class="container">
+            <h2>What Engineers Are Saying</h2>
+            <div class="testimonial-content">
+                "I used to spend 2 days writing procedures for each equipment type. Now I can do 20 procedures in 2 hours. This tool has saved me over 200 hours this year alone."
+            </div>
+            <div class="testimonial-author">
+                - Mike Johnson, Facility Engineer at Equinix
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="container">
+            <p>&copy; 2024 Excel Replacement. All rights reserved.</p>
+            <p>Questions? Email us at support@excelreplacement.com</p>
+        </div>
+    </div>
+</body>
+</html>
