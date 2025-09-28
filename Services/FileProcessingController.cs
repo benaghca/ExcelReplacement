@@ -37,6 +37,12 @@ namespace ExcelReplacement.Services
         {
             try
             {
+                // Ensure output directory exists
+                if (!Directory.Exists(request.OutputPath))
+                {
+                    Directory.CreateDirectory(request.OutputPath);
+                }
+
                 var records = _csvService.LoadCsvData(request.CsvFilePath);
                 var outputFiles = new List<string>();
                 int processedFiles = 0;
@@ -70,8 +76,12 @@ namespace ExcelReplacement.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error processing files");
-                return StatusCode(500, new { error = ex.Message });
+                _logger.LogError(ex, "Error processing files: {Message}", ex.Message);
+                return StatusCode(500, new { 
+                    error = "An error occurred while processing files", 
+                    details = ex.Message,
+                    stackTrace = ex.StackTrace
+                });
             }
         }
 

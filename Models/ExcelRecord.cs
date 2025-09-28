@@ -47,7 +47,38 @@ namespace ExcelReplacement.Models
             fileName = string.Join(" ", fileName.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries));
             fileName = fileName.Trim();
 
+            // Sanitize filename for Windows filesystem
+            fileName = SanitizeFileName(fileName);
+
             return fileName + extension;
+        }
+
+        private string SanitizeFileName(string fileName)
+        {
+            // Characters not allowed in Windows filenames
+            var invalidChars = new char[] { '<', '>', ':', '"', '|', '?', '*', '\\', '/' };
+            
+            foreach (var invalidChar in invalidChars)
+            {
+                fileName = fileName.Replace(invalidChar, '-');
+            }
+            
+            // Remove any leading/trailing dots and spaces
+            fileName = fileName.Trim('.', ' ');
+            
+            // Ensure filename is not empty
+            if (string.IsNullOrWhiteSpace(fileName))
+            {
+                fileName = "GeneratedFile";
+            }
+            
+            // Limit filename length (Windows has a 255 character limit for filenames)
+            if (fileName.Length > 200)
+            {
+                fileName = fileName.Substring(0, 200);
+            }
+            
+            return fileName;
         }
     }
 } 

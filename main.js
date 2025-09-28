@@ -68,28 +68,37 @@ autoUpdater.on('update-downloaded', () => {
 ipcMain.handle('select-csv-file', async () => {
     const result = await dialog.showOpenDialog({
         properties: ['openFile'],
-        filters: [{ name: 'CSV Files', extensions: ['csv'] }]
+        filters: [
+            { name: 'CSV Files', extensions: ['csv'] },
+            { name: 'All Files', extensions: ['*'] }
+        ]
     });
-    return result.canceled ? null : result.filePaths[0];
+    return result;
 });
 
 ipcMain.handle('select-template-file', async (event, type) => {
     const filters = type === 'excel' 
-        ? [{ name: 'Excel Files', extensions: ['xlsx', 'xls'] }]
-        : [{ name: 'Word Files', extensions: ['docx', 'doc'] }];
+        ? [
+            { name: 'Excel Files', extensions: ['xlsx', 'xls'] },
+            { name: 'All Files', extensions: ['*'] }
+        ]
+        : [
+            { name: 'Word Files', extensions: ['docx', 'doc'] },
+            { name: 'All Files', extensions: ['*'] }
+        ];
     
     const result = await dialog.showOpenDialog({
         properties: ['openFile'],
         filters
     });
-    return result.canceled ? null : result.filePaths[0];
+    return result;
 });
 
 ipcMain.handle('select-output-directory', async () => {
     const result = await dialog.showOpenDialog({
         properties: ['openDirectory']
     });
-    return result.canceled ? null : result.filePaths[0];
+    return result;
 });
 
 ipcMain.handle('get-settings', () => {
