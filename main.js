@@ -17,26 +17,15 @@ let backendProcess = null;
 const BACKEND_PORT = 5000;
 
 function startBackend() {
-    const isDev = process.argv.includes('--dev');
-    let backendPath;
-    
-    if (isDev) {
-        // Development: use dotnet run
-        backendPath = 'dotnet';
-        const args = ['run', '--urls', `http://localhost:${BACKEND_PORT}`];
-        log.info('Starting backend in development mode...');
-    } else {
-        // Production: use the bundled executable from extraResources
-        const backendExe = path.join(process.resourcesPath, 'bin', 'Release', 'net8.0', 'win-x64', 'publish', 'ExcelReplacement.exe');
-        backendPath = backendExe;
-        const args = ['--urls', `http://localhost:${BACKEND_PORT}`];
-        log.info('Starting backend from bundled executable...');
-    }
+    // Always use development mode for now (dotnet run)
+    const backendPath = 'dotnet';
+    const args = ['run', '--urls', `http://localhost:${BACKEND_PORT}`];
+    log.info('Starting backend in development mode...');
     
     try {
-        backendProcess = spawn(backendPath, isDev ? ['run', '--urls', `http://localhost:${BACKEND_PORT}`] : ['--urls', `http://localhost:${BACKEND_PORT}`], {
+        backendProcess = spawn(backendPath, args, {
             stdio: ['ignore', 'pipe', 'pipe'],
-            shell: isDev
+            shell: true
         });
         
         backendProcess.stdout.on('data', (data) => {
@@ -77,15 +66,37 @@ autoUpdater.autoDownload = false;
 
 function createWindow() {
     const mainWindow = new BrowserWindow({
-        width: 800,
-        height: 600,
+        width: 1000,
+        height: 700,
+        minWidth: 800,
+        minHeight: 600,
+        show: false, // Don't show until ready
+        titleBarStyle: 'default',
         webPreferences: {
             nodeIntegration: true,
-            contextIsolation: false
-        }
+            contextIsolation: false,
+            webSecurity: false
+        },
+        icon: path.join(__dirname, 'assets', 'icon.ico')
     });
 
-    mainWindow.loadFile('index.html');
+    // Show window when ready to prevent flickering
+    mainWindow.once('ready-to-show', () => {
+        mainWindow.show();
+        log.info('Main window shown');
+    });
+
+    // Handle window closed
+    mainWindow.on('closed', () => {
+        stopBackend();
+    });
+
+    // Load the HTML file
+    mainWindow.loadFile('index.html').then(() => {
+        log.info('HTML loaded successfully');
+    }).catch((error) => {
+        log.error(`Error loading HTML: ${error.message}`);
+    });
 
     // Check for updates
     autoUpdater.checkForUpdates();
@@ -94,6 +105,8 @@ function createWindow() {
     if (process.argv.includes('--dev')) {
         mainWindow.webContents.openDevTools();
     }
+
+    return mainWindow;
 }
 
 // Auto-updater events

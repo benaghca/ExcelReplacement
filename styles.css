@@ -588,7 +588,27 @@ button:focus {
 .column-item.selected {
     border-color: #3b82f6 !important;
     background: #eff6ff !important;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+    transform: scale(1.02);
+}
+
+.placeholder-item.potential-match,
+.column-item.potential-match {
+    border-color: #f59e0b !important;
+    background: #fffbeb !important;
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+}
+
+.placeholder-item:hover,
+.column-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.placeholder-item.selected:hover,
+.column-item.selected:hover {
+    transform: scale(1.02) translateY(-2px);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.3);
 }
 
 .mapping-display {
@@ -1083,4 +1103,10 @@ button:focus {
 
 .suggestion-icon.tip {
     color: #0369a1;
+}
+
+/* Loading Screen Animation */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }

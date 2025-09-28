@@ -17,6 +17,22 @@ document.addEventListener('DOMContentLoaded', function() {
     setupEventHandlers();
     setupDragAndDrop();
     testAPI();
+    
+    // Hide loading screen and show app
+    setTimeout(() => {
+        const loadingScreen = document.getElementById('loadingScreen');
+        const app = document.getElementById('app');
+        
+        if (loadingScreen && app) {
+            loadingScreen.style.opacity = '0';
+            app.style.opacity = '1';
+            
+            // Remove loading screen from DOM after transition
+            setTimeout(() => {
+                loadingScreen.remove();
+            }, 500);
+        }
+    }, 1000); // Wait 1 second for everything to load
 });
 
 function setupEventHandlers() {
@@ -1866,9 +1882,22 @@ function showTemplateValidationUI(previewData, csvFile, templateFile) {
                 <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                         <h3 style="margin: 0; color: #374151; font-size: 18px;">📋 Placeholder Analysis</h3>
-                        <button id="toggleMappingMode" style="padding: 6px 12px; background: #6b7280; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                        <button id="toggleMappingMode" style="padding: 8px 16px; background: #6b7280; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s;">
                             📋 View Mode
                         </button>
+                    </div>
+                    
+                    <!-- Mapping Instructions -->
+                    <div id="mappingInstructions" style="display: none; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 6px; padding: 12px; margin-bottom: 16px;">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                            <span style="font-size: 16px;">💡</span>
+                            <span style="font-weight: 600; color: #0369a1;">Mapping Instructions</span>
+                        </div>
+                        <div style="font-size: 12px; color: #0369a1; line-height: 1.4;">
+                            <strong>Mouse:</strong> Click any placeholder or column to select it, then click the target to map them together.<br>
+                            <strong>Keyboard:</strong> Use Tab/Shift+Tab to navigate, Enter to map, Escape to clear selection, Delete to remove mapping.<br>
+                            <strong>Quick Map:</strong> Click the suggestion buttons for instant mapping.
+                        </div>
                     </div>
                     
                     <div style="margin-bottom: 16px;">
@@ -1911,47 +1940,69 @@ function showTemplateValidationUI(previewData, csvFile, templateFile) {
                                      data-placeholder="${placeholder.name}" 
                                      data-index="${index}"
                                      draggable="true"
-                                     style="margin-bottom: 12px; padding: 12px; background: white; border: 1px solid ${isMatched ? '#dcfce7' : '#fecaca'}; border-radius: 6px; cursor: grab; transition: all 0.2s;">
+                                     style="margin-bottom: 12px; padding: 16px; background: white; border: 2px solid ${isMatched ? '#dcfce7' : '#fecaca'}; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; position: relative; min-height: 60px;"
+                                     onclick="selectPlaceholderForMapping('${placeholder.name}')"
+                                     onmouseenter="highlightPlaceholder('${placeholder.name}')"
+                                     onmouseleave="unhighlightPlaceholder('${placeholder.name}')">
+                                    
+                                    <!-- Main content area with larger click target -->
                                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                        <div style="display: flex; align-items: center; gap: 8px;">
-                                            <span style="font-size: 12px; color: #6b7280;">⋮⋮</span>
-                                            <span style="font-family: monospace; font-weight: 600; color: #1e293b;">${placeholder.full}</span>
-                                            <span style="padding: 2px 4px; background: ${confidence > 0.8 ? '#dcfce7' : confidence > 0.6 ? '#fef3c7' : '#fecaca'}; color: ${confidence > 0.8 ? '#166534' : confidence > 0.6 ? '#92400e' : '#dc2626'}; border-radius: 2px; font-size: 10px;">
-                                                ${Math.round(confidence * 100)}%
-                                            </span>
-                                        </div>
-                                        <div style="display: flex; align-items: center; gap: 8px;">
-                                            ${mappedColumn ? `
-                                                <span style="padding: 2px 6px; background: #dbeafe; color: #1e40af; border-radius: 3px; font-size: 11px;">
-                                                    → ${mappedColumn}
+                                        <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                                            <div style="display: flex; align-items: center; gap: 8px;">
+                                                <span style="font-size: 14px; color: #6b7280; user-select: none;">⋮⋮</span>
+                                                <span style="font-family: monospace; font-weight: 600; color: #1e293b; font-size: 14px;">${placeholder.full}</span>
+                                                <span style="padding: 3px 6px; background: ${confidence > 0.8 ? '#dcfce7' : confidence > 0.6 ? '#fef3c7' : '#fecaca'}; color: ${confidence > 0.8 ? '#166534' : confidence > 0.6 ? '#92400e' : '#dc2626'}; border-radius: 4px; font-size: 11px; font-weight: 600;">
+                                                    ${Math.round(confidence * 100)}%
                                                 </span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div style="display: flex; align-items: center; gap: 12px;">
+                                            ${mappedColumn ? `
+                                                <div style="display: flex; align-items: center; gap: 6px; padding: 6px 10px; background: #dbeafe; color: #1e40af; border-radius: 6px; font-size: 12px; font-weight: 500;">
+                                                    <span>→</span>
+                                                    <span style="font-family: monospace;">${mappedColumn}</span>
+                                                    <button onclick="event.stopPropagation(); clearMapping('${placeholder.name}')" 
+                                                            style="background: none; border: none; color: #6b7280; cursor: pointer; padding: 2px; border-radius: 3px; font-size: 12px;"
+                                                            onmouseover="this.style.background='#f3f4f6'" 
+                                                            onmouseout="this.style.background='none'">
+                                                        ✕
+                                                    </button>
+                                                </div>
                                             ` : ''}
-                                            <span style="padding: 2px 6px; background: ${isMatched ? '#dcfce7' : '#fecaca'}; color: ${isMatched ? '#166534' : '#dc2626'}; border-radius: 3px; font-size: 11px;">
-                                                ${isMatched ? '✓ Matched' : '✗ No Match'}
-                                            </span>
+                                            
+                                            <div style="padding: 6px 10px; background: ${isMatched ? '#dcfce7' : '#fecaca'}; color: ${isMatched ? '#166534' : '#dc2626'}; border-radius: 6px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                                                ${isMatched ? '✓' : '✗'}
+                                                <span>${isMatched ? 'Matched' : 'No Match'}</span>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                        <div style="font-size: 11px; color: #6b7280;">
-                                            Detected by: ${detectedBy.replace('_', ' ')} pattern
-                                        </div>
-                                        <div style="font-size: 11px; color: #6b7280;">
-                                            ${placeholder.pattern ? `${placeholder.pattern.start}${placeholder.pattern.end}` : 'Unknown pattern'}
-                                        </div>
+                                    
+                                    <!-- Metadata row -->
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 11px; color: #6b7280;">
+                                        <div>Detected by: ${detectedBy.replace('_', ' ')} pattern</div>
+                                        <div>${placeholder.pattern ? `${placeholder.pattern.start}${placeholder.pattern.end}` : 'Unknown pattern'}</div>
                                     </div>
+                                    
+                                    <!-- Quick suggestions with better styling -->
                                     ${!isMatched && suggestions.length > 0 ? `
-                                        <div style="margin-top: 8px;">
-                                            <div style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">Quick suggestions:</div>
-                                            <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                                        <div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid #f3f4f6;">
+                                            <div style="font-size: 12px; color: #6b7280; margin-bottom: 6px; font-weight: 500;">Quick suggestions:</div>
+                                            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
                                                 ${suggestions.map(suggestion => `
-                                                    <button onclick="quickMapPlaceholder('${placeholder.name}', '${suggestion}')" 
-                                                            style="padding: 2px 6px; background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; border-radius: 3px; font-size: 11px; cursor: pointer;">
+                                                    <button onclick="event.stopPropagation(); quickMapPlaceholder('${placeholder.name}', '${suggestion}')" 
+                                                            style="padding: 4px 8px; background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; border-radius: 4px; font-size: 11px; cursor: pointer; transition: all 0.2s; font-weight: 500;"
+                                                            onmouseover="this.style.background='#c7d2fe'; this.style.transform='translateY(-1px)'" 
+                                                            onmouseout="this.style.background='#e0e7ff'; this.style.transform='translateY(0)'">
                                                         ${suggestion}
                                                     </button>
                                                 `).join('')}
                                             </div>
                                         </div>
                                     ` : ''}
+                                    
+                                    <!-- Hover indicator -->
+                                    <div class="hover-indicator" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(90deg, rgba(59, 130, 246, 0.05) 0%, rgba(59, 130, 246, 0.1) 100%); border-radius: 8px; opacity: 0; transition: opacity 0.3s ease; pointer-events: none;"></div>
                                 </div>
                             `;
                         }).join('')}
@@ -1997,21 +2048,38 @@ function showTemplateValidationUI(previewData, csvFile, templateFile) {
                             return `
                                 <div class="column-item ${isUsed ? 'used' : isUnused ? 'unused' : 'available'}" 
                                      data-column="${column}" 
-                                     style="margin-bottom: 8px; padding: 8px; background: white; border: 1px solid ${isUsed ? '#dcfce7' : isUnused ? '#fef3c7' : '#e5e7eb'}; border-radius: 4px; transition: all 0.2s; cursor: pointer;"
-                                     onclick="selectColumnForMapping('${column}')">
+                                     style="margin-bottom: 12px; padding: 16px; background: white; border: 2px solid ${isUsed ? '#dcfce7' : isUnused ? '#fef3c7' : '#e5e7eb'}; border-radius: 8px; transition: all 0.3s ease; cursor: pointer; position: relative; min-height: 50px;"
+                                     onclick="selectColumnForMapping('${column}')"
+                                     onmouseenter="highlightColumn('${column}')"
+                                     onmouseleave="unhighlightColumn('${column}')">
+                                    
                                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <div style="display: flex; align-items: center; gap: 8px;">
-                                            <span style="font-family: monospace; font-weight: 500; color: #1e293b;">${column}</span>
-                                            ${mappedPlaceholders.length > 0 ? `
-                                                <span style="padding: 2px 6px; background: #dbeafe; color: #1e40af; border-radius: 3px; font-size: 10px;">
-                                                    ← ${mappedPlaceholders.join(', ')}
-                                                </span>
-                                            ` : ''}
+                                        <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                                            <div style="display: flex; align-items: center; gap: 8px;">
+                                                <span style="font-family: monospace; font-weight: 600; color: #1e293b; font-size: 14px;">${column}</span>
+                                                ${mappedPlaceholders.length > 0 ? `
+                                                    <div style="display: flex; align-items: center; gap: 6px; padding: 4px 8px; background: #dbeafe; color: #1e40af; border-radius: 4px; font-size: 11px; font-weight: 500;">
+                                                        <span>←</span>
+                                                        <span style="font-family: monospace;">${mappedPlaceholders.join(', ')}</span>
+                                                        <button onclick="event.stopPropagation(); clearColumnMapping('${column}')" 
+                                                                style="background: none; border: none; color: #6b7280; cursor: pointer; padding: 2px; border-radius: 3px; font-size: 10px;"
+                                                                onmouseover="this.style.background='#f3f4f6'" 
+                                                                onmouseout="this.style.background='none'">
+                                                            ✕
+                                                        </button>
+                                                    </div>
+                                                ` : ''}
+                                            </div>
                                         </div>
-                                        <span style="padding: 2px 6px; background: ${isUsed ? '#dcfce7' : isUnused ? '#fef3c7' : '#f3f4f6'}; color: ${isUsed ? '#166534' : isUnused ? '#92400e' : '#6b7280'}; border-radius: 3px; font-size: 11px;">
-                                            ${isUsed ? '✓ Used' : isUnused ? '⚠ Unused' : '○ Available'}
-                                        </span>
+                                        
+                                        <div style="padding: 6px 10px; background: ${isUsed ? '#dcfce7' : isUnused ? '#fef3c7' : '#f3f4f6'}; color: ${isUsed ? '#166534' : isUnused ? '#92400e' : '#6b7280'}; border-radius: 6px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                                            ${isUsed ? '✓' : isUnused ? '⚠' : '○'}
+                                            <span>${isUsed ? 'Used' : isUnused ? 'Unused' : 'Available'}</span>
+                                        </div>
                                     </div>
+                                    
+                                    <!-- Hover indicator -->
+                                    <div class="hover-indicator" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(90deg, rgba(59, 130, 246, 0.05) 0%, rgba(59, 130, 246, 0.1) 100%); border-radius: 8px; opacity: 0; transition: opacity 0.3s ease; pointer-events: none;"></div>
                                 </div>
                             `;
                         }).join('')}
@@ -2439,16 +2507,26 @@ function showTemplateValidationUI(previewData, csvFile, templateFile) {
     document.getElementById('toggleMappingMode').onclick = () => {
         isMappingMode = !isMappingMode;
         const button = document.getElementById('toggleMappingMode');
+        const instructions = document.getElementById('mappingInstructions');
+        
         if (isMappingMode) {
-            button.textContent = '🎯 Mapping Mode';
+            button.textContent = '🎯 Mapping Mode (ON)';
             button.style.background = '#059669';
+            instructions.style.display = 'block';
             enableMappingMode();
-            updateStatus('Mapping mode enabled. Click placeholders and columns to map them.', 'info');
+            updateStatus('Mapping mode enabled! Click any placeholder or column to start mapping. Use Tab/Enter for keyboard navigation.', 'success');
+            
+            // Add keyboard event listeners
+            document.addEventListener('keydown', handleKeyboardMapping);
         } else {
             button.textContent = '📋 View Mode';
             button.style.background = '#6b7280';
+            instructions.style.display = 'none';
             disableMappingMode();
             updateStatus('Mapping mode disabled.', 'info');
+            
+            // Remove keyboard event listeners
+            document.removeEventListener('keydown', handleKeyboardMapping);
         }
     };
     
@@ -2524,11 +2602,84 @@ function showTemplateValidationUI(previewData, csvFile, templateFile) {
             item.removeEventListener('click', handleColumnClick);
         });
         
-        // Clear selection
-        selectedPlaceholder = null;
-        document.querySelectorAll('.placeholder-item, .column-item').forEach(item => {
-            item.classList.remove('selected');
-        });
+        // Clear selection and highlights
+        clearSelection();
+        
+        // Remove keyboard event listeners
+        document.removeEventListener('keydown', handleKeyboardMapping);
+    }
+    
+    function handleKeyboardMapping(e) {
+        if (!isMappingMode) return;
+        
+        switch(e.key) {
+            case 'Escape':
+                clearSelection();
+                updateStatus('Selection cleared. Press Tab to navigate or click items to map.', 'info');
+                break;
+                
+            case 'Tab':
+                e.preventDefault();
+                navigateItems(e.shiftKey ? -1 : 1);
+                break;
+                
+            case 'Enter':
+            case ' ':
+                e.preventDefault();
+                if (selectedPlaceholder) {
+                    // If we have a selected placeholder, try to map it to the first available column
+                    const availableColumns = document.querySelectorAll('.column-item:not(.used)');
+                    if (availableColumns.length > 0) {
+                        const firstColumn = availableColumns[0].dataset.column;
+                        selectColumnForMapping(firstColumn);
+                    } else {
+                        updateStatus('No available columns to map to. Try clearing some mappings first.', 'warning');
+                    }
+                }
+                break;
+                
+            case 'Delete':
+            case 'Backspace':
+                if (selectedPlaceholder && currentMappings[selectedPlaceholder]) {
+                    clearMapping(selectedPlaceholder);
+                }
+                break;
+        }
+    }
+    
+    function navigateItems(direction) {
+        const allItems = [...document.querySelectorAll('.placeholder-item'), ...document.querySelectorAll('.column-item')];
+        const currentIndex = allItems.findIndex(item => item.classList.contains('selected'));
+        
+        let newIndex;
+        if (currentIndex === -1) {
+            // No current selection, start with first item
+            newIndex = 0;
+        } else {
+            newIndex = currentIndex + direction;
+            if (newIndex < 0) newIndex = allItems.length - 1;
+            if (newIndex >= allItems.length) newIndex = 0;
+        }
+        
+        // Clear previous selection
+        allItems.forEach(item => item.classList.remove('selected'));
+        
+        // Select new item
+        const newItem = allItems[newIndex];
+        if (newItem) {
+            newItem.classList.add('selected');
+            newItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            
+            if (newItem.classList.contains('placeholder-item')) {
+                selectedPlaceholder = newItem.dataset.placeholder;
+                updateStatus(`Selected placeholder: [${selectedPlaceholder}]. Press Enter to map or Tab to navigate.`, 'info');
+                highlightPotentialMatches(selectedPlaceholder);
+            } else {
+                selectedPlaceholder = newItem.dataset.column;
+                updateStatus(`Selected column: ${selectedPlaceholder}. Press Enter to map or Tab to navigate.`, 'info');
+                highlightPotentialMatches(selectedPlaceholder, true);
+            }
+        }
     }
     
     function handleDragStart(e) {
@@ -2601,6 +2752,171 @@ function showTemplateValidationUI(previewData, csvFile, templateFile) {
             selectedPlaceholder = column;
             updateStatus(`Selected column: ${column}. Now click a placeholder to map it.`, 'info');
         }
+    }
+    
+    // New improved mapping functions
+    function selectPlaceholderForMapping(placeholderName) {
+        if (!isMappingMode) {
+            updateStatus('Enable mapping mode first by clicking the "Mapping Mode" button', 'warning');
+            return;
+        }
+        
+        // Clear previous selections
+        document.querySelectorAll('.placeholder-item, .column-item').forEach(item => {
+            item.classList.remove('selected');
+        });
+        
+        // Select this placeholder
+        const placeholderElement = document.querySelector(`[data-placeholder="${placeholderName}"]`);
+        if (placeholderElement) {
+            placeholderElement.classList.add('selected');
+            selectedPlaceholder = placeholderName;
+            updateStatus(`Selected placeholder: [${placeholderName}]. Now click a column to map it.`, 'info');
+            
+            // Highlight potential matches
+            highlightPotentialMatches(placeholderName);
+        }
+    }
+    
+    function selectColumnForMapping(columnName) {
+        if (!isMappingMode) {
+            updateStatus('Enable mapping mode first by clicking the "Mapping Mode" button', 'warning');
+            return;
+        }
+        
+        if (selectedPlaceholder) {
+            // Map selected placeholder to clicked column
+            currentMappings[selectedPlaceholder] = columnName;
+            updateMappingDisplay();
+            updateStatus(`Mapped [${selectedPlaceholder}] → ${columnName}`, 'success');
+            
+            // Clear selection and highlights
+            clearSelection();
+        } else {
+            // Select this column for mapping
+            document.querySelectorAll('.placeholder-item, .column-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            const columnElement = document.querySelector(`[data-column="${columnName}"]`);
+            if (columnElement) {
+                columnElement.classList.add('selected');
+                selectedPlaceholder = columnName;
+                updateStatus(`Selected column: ${columnName}. Now click a placeholder to map it.`, 'info');
+                
+                // Highlight potential matches
+                highlightPotentialMatches(columnName, true);
+            }
+        }
+    }
+    
+    function highlightPlaceholder(placeholderName) {
+        if (!isMappingMode) return;
+        
+        const element = document.querySelector(`[data-placeholder="${placeholderName}"]`);
+        if (element) {
+            const indicator = element.querySelector('.hover-indicator');
+            if (indicator) {
+                indicator.style.opacity = '1';
+            }
+        }
+    }
+    
+    function unhighlightPlaceholder(placeholderName) {
+        if (!isMappingMode) return;
+        
+        const element = document.querySelector(`[data-placeholder="${placeholderName}"]`);
+        if (element && !element.classList.contains('selected')) {
+            const indicator = element.querySelector('.hover-indicator');
+            if (indicator) {
+                indicator.style.opacity = '0';
+            }
+        }
+    }
+    
+    function highlightColumn(columnName) {
+        if (!isMappingMode) return;
+        
+        const element = document.querySelector(`[data-column="${columnName}"]`);
+        if (element) {
+            const indicator = element.querySelector('.hover-indicator');
+            if (indicator) {
+                indicator.style.opacity = '1';
+            }
+        }
+    }
+    
+    function unhighlightColumn(columnName) {
+        if (!isMappingMode) return;
+        
+        const element = document.querySelector(`[data-column="${columnName}"]`);
+        if (element && !element.classList.contains('selected')) {
+            const indicator = element.querySelector('.hover-indicator');
+            if (indicator) {
+                indicator.style.opacity = '0';
+            }
+        }
+    }
+    
+    function highlightPotentialMatches(target, isColumn = false) {
+        // Clear previous highlights
+        document.querySelectorAll('.placeholder-item, .column-item').forEach(item => {
+            item.classList.remove('potential-match');
+        });
+        
+        if (isColumn) {
+            // Highlight placeholders that could match this column
+            const targetLower = target.toLowerCase();
+            document.querySelectorAll('.placeholder-item').forEach(item => {
+                const placeholder = item.dataset.placeholder;
+                if (placeholder && placeholder.toLowerCase().includes(targetLower)) {
+                    item.classList.add('potential-match');
+                }
+            });
+        } else {
+            // Highlight columns that could match this placeholder
+            const targetLower = target.toLowerCase();
+            document.querySelectorAll('.column-item').forEach(item => {
+                const column = item.dataset.column;
+                if (column && column.toLowerCase().includes(targetLower)) {
+                    item.classList.add('potential-match');
+                }
+            });
+        }
+    }
+    
+    function clearSelection() {
+        selectedPlaceholder = null;
+        document.querySelectorAll('.placeholder-item, .column-item').forEach(item => {
+            item.classList.remove('selected', 'potential-match');
+            const indicator = item.querySelector('.hover-indicator');
+            if (indicator) {
+                indicator.style.opacity = '0';
+            }
+        });
+    }
+    
+    function clearMapping(placeholderName) {
+        delete currentMappings[placeholderName];
+        updateMappingDisplay();
+        updateStatus(`Cleared mapping for [${placeholderName}]`, 'info');
+    }
+    
+    function clearColumnMapping(columnName) {
+        // Find and remove all mappings to this column
+        Object.keys(currentMappings).forEach(placeholder => {
+            if (currentMappings[placeholder] === columnName) {
+                delete currentMappings[placeholder];
+            }
+        });
+        updateMappingDisplay();
+        updateStatus(`Cleared all mappings to column: ${columnName}`, 'info');
+    }
+    
+    function quickMapPlaceholder(placeholderName, columnName) {
+        currentMappings[placeholderName] = columnName;
+        updateMappingDisplay();
+        updateStatus(`Quick mapped [${placeholderName}] → ${columnName}`, 'success');
     }
     
     function updateMappingDisplay() {
