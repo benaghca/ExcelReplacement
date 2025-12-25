@@ -1,0 +1,176 @@
+<Window x:Class="TextReplacer.App.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:TextReplacer.App.ViewModels"
+        xmlns:converters="clr-namespace:TextReplacer.App.Converters"
+        Title="TextReplacer"
+        Height="650" Width="600"
+        MinHeight="550" MinWidth="500"
+        WindowStartupLocation="CenterScreen">
+
+    <Window.DataContext>
+        <vm:MainViewModel/>
+    </Window.DataContext>
+
+    <Window.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibility"/>
+        <converters:InverseBoolConverter x:Key="InverseBool"/>
+    </Window.Resources>
+
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- File Selection -->
+        <GroupBox Grid.Row="0" Header="Files" Padding="10">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Row="0" Grid.Column="0" Content="Template:"/>
+                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding TemplatePath, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True"/>
+                <Button Grid.Row="0" Grid.Column="2" Content="Browse..." Command="{Binding BrowseTemplateCommand}"/>
+
+                <Label Grid.Row="1" Grid.Column="0" Content="CSV File:"/>
+                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding CsvPath, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True"/>
+                <Button Grid.Row="1" Grid.Column="2" Content="Browse..." Command="{Binding BrowseCsvCommand}"/>
+
+                <Label Grid.Row="2" Grid.Column="0" Content="Output:"/>
+                <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding OutputDirectory, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True"/>
+                <Button Grid.Row="2" Grid.Column="2" Content="Browse..." Command="{Binding BrowseOutputCommand}"/>
+            </Grid>
+        </GroupBox>
+
+        <!-- Placeholder Settings -->
+        <GroupBox Grid.Row="1" Header="Placeholder Settings" Padding="10" Margin="0,10,0,0">
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Prefix:"/>
+                <TextBox Width="50" Text="{Binding PlaceholderPrefix, UpdateSourceTrigger=PropertyChanged}"/>
+                <Label Content="Suffix:" Margin="20,0,0,0"/>
+                <TextBox Width="50" Text="{Binding PlaceholderSuffix, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock VerticalAlignment="Center" Margin="20,0,0,0" Foreground="Gray">
+                    <Run Text="Example: "/>
+                    <Run Text="{Binding PlaceholderPrefix, Mode=OneWay}"/>
+                    <Run Text="FieldName"/>
+                    <Run Text="{Binding PlaceholderSuffix, Mode=OneWay}"/>
+                </TextBlock>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- Output Naming -->
+        <GroupBox Grid.Row="2" Header="Output Naming" Padding="10" Margin="0,10,0,0">
+            <StackPanel>
+                <RadioButton Content="Sequential numbering"
+                             IsChecked="{Binding UsePatternNaming, Converter={StaticResource InverseBool}}"
+                             Margin="0,0,0,5"/>
+                <StackPanel Orientation="Horizontal" Margin="20,0,0,5"
+                            IsEnabled="{Binding UsePatternNaming, Converter={StaticResource InverseBool}}">
+                    <Label Content="Prefix:"/>
+                    <TextBox Width="150" Text="{Binding SequentialPrefix, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock VerticalAlignment="Center" Margin="10,0,0,0" Foreground="Gray" Text="e.g., output_001.docx"/>
+                </StackPanel>
+
+                <RadioButton Content="Use pattern from CSV columns"
+                             IsChecked="{Binding UsePatternNaming}"
+                             Margin="0,5,0,5"/>
+                <StackPanel Orientation="Horizontal" Margin="20,0,0,0" IsEnabled="{Binding UsePatternNaming}">
+                    <Label Content="Pattern:"/>
+                    <TextBox Width="250" Text="{Binding NamingPattern, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock VerticalAlignment="Center" Margin="10,0,0,0" Foreground="Gray" Text="Use {ColumnName}"/>
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- Validation Results -->
+        <GroupBox Grid.Row="4" Header="Validation" Padding="10" Margin="0,10,0,0">
+            <Grid>
+                <StackPanel Visibility="{Binding IsValidated, Converter={StaticResource BoolToVisibility}}">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                        <TextBlock Text="Placeholders found: " FontWeight="Bold"/>
+                        <TextBlock Text="{Binding PlaceholderCount}"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                        <TextBlock Text="Matched: " Foreground="Green" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding MatchedCount}" Foreground="Green"/>
+                    </StackPanel>
+
+                    <StackPanel Visibility="{Binding MissingCount, Converter={StaticResource BoolToVisibility}}" Margin="0,0,0,5">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Missing from CSV: " Foreground="Red" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding MissingCount}" Foreground="Red"/>
+                        </StackPanel>
+                        <ItemsControl ItemsSource="{Binding MissingPlaceholders}" Margin="20,5,0,0">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" Foreground="Red"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+
+                    <StackPanel Visibility="{Binding UnusedCount, Converter={StaticResource BoolToVisibility}}" Margin="0,0,0,5">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Unused CSV columns: " Foreground="Orange" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding UnusedCount}" Foreground="Orange"/>
+                        </StackPanel>
+                        <ItemsControl ItemsSource="{Binding UnusedColumns}" Margin="20,5,0,0">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" Foreground="Orange"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </StackPanel>
+
+                <TextBlock Text="Click 'Validate' to check template placeholders against CSV columns."
+                           Visibility="{Binding IsValidated, Converter={StaticResource BoolToVisibility}, ConverterParameter=Inverse}"
+                           Foreground="Gray" VerticalAlignment="Center"/>
+            </Grid>
+        </GroupBox>
+
+        <!-- Progress -->
+        <GroupBox Grid.Row="5" Header="Progress" Padding="10" Margin="0,10,0,0">
+            <StackPanel>
+                <ProgressBar Height="25" Value="{Binding ProgressValue}" Maximum="100"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,0">
+                    <TextBlock Text="{Binding ProgressText}"/>
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- Buttons and Status -->
+        <Grid Grid.Row="6" Margin="0,10,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0" Text="{Binding StatusMessage}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+
+            <Button Grid.Column="1" Content="Validate" Command="{Binding ValidateCommand}" Width="100"/>
+            <Button Grid.Column="2" Content="Process" Command="{Binding ProcessCommand}" Width="100"
+                    IsDefault="True" FontWeight="Bold"/>
+            <Button Grid.Column="3" Content="Cancel" Command="{Binding CancelCommand}" Width="80"
+                    Visibility="{Binding IsProcessing, Converter={StaticResource BoolToVisibility}}"/>
+        </Grid>
+    </Grid>
+</Window>
