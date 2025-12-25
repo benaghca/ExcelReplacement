@@ -335,17 +335,25 @@ public class ExcelProcessor : IDocumentProcessor
                 AddPreservingFormatting(result, charMap, currentPos, match.Index - 1);
             }
 
-            // Add replacement text with formatting from the first character of the placeholder
             var placeholderName = match.Groups[1].Value;
-            var replacement = replacements.TryGetValue(placeholderName, out var value) ? value : string.Empty;
 
-            if (!string.IsNullOrEmpty(replacement))
+            // Check if we have a replacement value
+            if (replacements.TryGetValue(placeholderName, out var value))
             {
-                var startProps = charMap[match.Index].Properties;
-                result.Add(new RichTextRun(replacement, CloneProperties(startProps)));
+                // Add replacement text with formatting from the first character of the placeholder
+                if (!string.IsNullOrEmpty(value))
+                {
+                    var startProps = charMap[match.Index].Properties;
+                    result.Add(new RichTextRun(value, CloneProperties(startProps)));
+                }
+                currentPos = match.Index + match.Length;
             }
-
-            currentPos = match.Index + match.Length;
+            else
+            {
+                // No matching column - leave placeholder unchanged (preserving its formatting)
+                AddPreservingFormatting(result, charMap, match.Index, match.Index + match.Length - 1);
+                currentPos = match.Index + match.Length;
+            }
         }
 
         // Add any remaining text after the last match
@@ -492,7 +500,8 @@ public class ExcelProcessor : IDocumentProcessor
         return pattern.Replace(text, match =>
         {
             var placeholderName = match.Groups[1].Value;
-            return replacements.TryGetValue(placeholderName, out var value) ? value : string.Empty;
+            // Leave placeholder unchanged if no matching column in CSV
+            return replacements.TryGetValue(placeholderName, out var value) ? value : match.Value;
         });
     }
 

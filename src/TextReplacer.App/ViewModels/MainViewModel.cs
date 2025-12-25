@@ -67,6 +67,9 @@ public partial class MainViewModel : ObservableObject
     public ObservableCollection<string> MissingPlaceholders { get; } = new();
     public ObservableCollection<string> UnusedColumns { get; } = new();
 
+    // Available CSV columns for output naming pattern
+    public ObservableCollection<string> CsvColumns { get; } = new();
+
     // Progress
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ValidateCommand))]
@@ -114,7 +117,29 @@ public partial class MainViewModel : ObservableObject
         {
             CsvPath = dialog.FileName;
             IsValidated = false;
+            LoadCsvColumns();
             StatusMessage = "CSV selected. Click Validate to check placeholders.";
+        }
+    }
+
+    private void LoadCsvColumns()
+    {
+        CsvColumns.Clear();
+
+        if (string.IsNullOrWhiteSpace(CsvPath) || !File.Exists(CsvPath))
+            return;
+
+        try
+        {
+            using var csvReader = new CsvReaderService(CsvPath);
+            foreach (var header in csvReader.GetHeaders())
+            {
+                CsvColumns.Add(header);
+            }
+        }
+        catch
+        {
+            // Silently fail - columns just won't be shown
         }
     }
 

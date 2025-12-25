@@ -152,8 +152,11 @@ public class WordProcessor : IDocumentProcessor
             var match = matches[m];
             var placeholderName = match.Groups[1].Value;
 
-            // Get replacement value (use empty string if not found)
-            var replacement = replacements.TryGetValue(placeholderName, out var value) ? value : string.Empty;
+            // Skip if no matching column - leave placeholder unchanged
+            if (!replacements.TryGetValue(placeholderName, out var replacement))
+                continue;
+
+            replacement ??= string.Empty;
 
             // Find which runs contain this match
             var startPos = match.Index;
