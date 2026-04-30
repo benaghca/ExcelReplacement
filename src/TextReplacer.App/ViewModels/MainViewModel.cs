@@ -48,6 +48,10 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private string _sequentialPrefix = "output";
 
+    // PDF export
+    [ObservableProperty]
+    private bool _exportAsPdf = false;
+
     // Validation results
     [ObservableProperty]
     private bool _isValidated = false;
@@ -255,7 +259,8 @@ public partial class MainViewModel : ObservableObject
                     UsePattern = UsePatternNaming,
                     Pattern = NamingPattern,
                     SequentialPrefix = SequentialPrefix
-                }
+                },
+                ExportAsPdf = ExportAsPdf
             };
 
             var progress = new Progress<ProgressInfo>(info =>

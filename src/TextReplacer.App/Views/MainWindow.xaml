@@ -114,6 +114,17 @@
             </StackPanel>
         </GroupBox>
 
+        <!-- PDF Export Option -->
+        <GroupBox Grid.Row="3" Header="Export Options" Padding="10" Margin="0,10,0,0">
+            <StackPanel Orientation="Horizontal">
+                <CheckBox Content="Export as PDF (instead of native format)"
+                          IsChecked="{Binding ExportAsPdf}"
+                          VerticalAlignment="Center"/>
+                <TextBlock VerticalAlignment="Center" Margin="15,0,0,0" Foreground="Gray" FontSize="11"
+                           Text="Requires no Office installation. Free tier limited to small files."/>
+            </StackPanel>
+        </GroupBox>
+
         <!-- Validation Results -->
         <GroupBox Grid.Row="4" Header="Validation" Padding="10" Margin="0,10,0,0">
             <Grid>

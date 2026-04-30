@@ -31,6 +31,11 @@ public class ReplacementJob
     public OutputNamingConfig OutputNamingConfig { get; set; } = new();
 
     /// <summary>
+    /// When true, output files are exported as PDFs instead of the native format.
+    /// </summary>
+    public bool ExportAsPdf { get; set; } = false;
+
+    /// <summary>
     /// Gets the file extension of the template (e.g., ".docx", ".xlsx").
     /// </summary>
     public string TemplateExtension => Path.GetExtension(TemplatePath).ToLowerInvariant();

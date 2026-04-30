@@ -49,6 +49,9 @@ public class JobRunner
             await Task.Run(() =>
             {
                 processor.Process(job.TemplatePath, outputPath, row, job.PlaceholderConfig);
+
+                if (job.ExportAsPdf)
+                    outputPath = PdfExporter.ConvertToPdf(outputPath);
             }, cancellationToken);
 
             outputFiles.Add(outputPath);
